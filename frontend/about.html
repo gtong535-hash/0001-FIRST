@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="개발자 홍길동 소개 및 경력 이력">
+  <title>Developer Portfolio | 소개 (About Me)</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Header / Navbar ==================== -->
+  <header id="header" class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-accent">&lt;</span>Dev.Profile<span class="logo-accent">/&gt;</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="about.html" class="nav-link active">소개</a></li>
+          <li><a href="skills.html" class="nav-link">기술</a></li>
+          <li><a href="projects.html" class="nav-link">프로젝트</a></li>
+        </ul>
+      </nav>
+
+      <!-- Actions -->
+      <div class="nav-actions">
+        <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="btn-icon hamburger" aria-label="메뉴 열기" title="메뉴 열기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <!-- Page Banner -->
+    <section class="page-banner">
+      <div class="container">
+        <span class="section-subtitle">About Me</span>
+        <h1 class="page-title">개발자 소개 및 이력</h1>
+        <p class="page-subtitle">사용자 중심의 가치를 만드는 프론트엔드 개발자 홍길동을 소개합니다.</p>
+      </div>
+    </section>
+
+    <!-- About Content Section -->
+    <section class="section about-section">
+      <div class="container">
+        <div class="about-grid">
+          <!-- Left: Narrative -->
+          <div class="about-text reveal">
+            <h2 class="about-heading">“코드로 문제를 해결하고 사용자에게 감동을 주는 개발자”</h2>
+            <p>
+              웹 프론트엔드 엔지니어로서 성능 최적화, 웹 접근성, 그리고 인터랙티브한 UI 구현에 깊은 관심을 가지고 있습니다.
+              새로운 기술을 빠르게 학습하여 실무에 적용하는 것을 즐기며, 동료와의 원활한 커뮤니케이션과 협업을 중요하게 생각합니다.
+            </p>
+            <p>
+              단순히 작동하는 코드를 넘어, 읽기 쉽고 확장 가능한 아키텍처를 설계하기 위해 끊임없이 고민하며 사용자의 피드백을 바탕으로 제품을 지속해서 발전시켜 나갑니다.
+            </p>
+
+            <div class="about-highlights">
+              <div class="highlight-item">
+                <span class="highlight-number">3+</span>
+                <span class="highlight-label">Years Experience</span>
+              </div>
+              <div class="highlight-item">
+                <span class="highlight-number">15+</span>
+                <span class="highlight-label">Projects Completed</span>
+              </div>
+              <div class="highlight-item">
+                <span class="highlight-number">100%</span>
+                <span class="highlight-label">Passion & Growth</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Summary Card -->
+          <div class="about-info-card reveal">
+            <h3 class="info-card-title">인적 사항 요약</h3>
+            <ul class="info-list">
+              <li>
+                <span class="info-label"><i class="fa-solid fa-user"></i> 성명:</span>
+                <span class="info-value">홍길동 (Hong Gil-Dong)</span>
+              </li>
+              <li>
+                <span class="info-label"><i class="fa-solid fa-location-dot"></i> 거주지:</span>
+                <span class="info-value">대한민국 서울</span>
+              </li>
+              <li>
+                <span class="info-label"><i class="fa-solid fa-graduation-cap"></i> 학력:</span>
+                <span class="info-value">컴퓨터공학 학사 졸업</span>
+              </li>
+              <li>
+                <span class="info-label"><i class="fa-solid fa-envelope"></i> 이메일:</span>
+                <span class="info-value">developer@example.com</span>
+              </li>
+              <li>
+                <span class="info-label"><i class="fa-solid fa-language"></i> 언어:</span>
+                <span class="info-value">한국어 (Native), 영어 (기술 문서 독해)</span>
+              </li>
+            </ul>
+            <a href="projects.html" class="btn btn-primary btn-full">
+              <i class="fa-solid fa-folder-open"></i> 프로젝트 포트폴리오 보기
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience & Education Section -->
+    <section class="section experience-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-subtitle">Career Path</span>
+          <h2 class="section-title">경력 및 활동 이력</h2>
+          <div class="title-bar"></div>
+        </div>
+
+        <div class="timeline reveal">
+          <!-- Item 1 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">2024.03 ~ 현재</div>
+            <div class="timeline-card">
+              <h3 class="timeline-title">프론트엔드 개발자</h3>
+              <p class="timeline-company">(주)테크스타트업 | 풀타임</p>
+              <p class="timeline-desc">
+                사용자 대시보드 및 실시간 데이터 시각화 웹 애플리케이션 개발. 웹 접근성 개선 및 컴포넌트 재사용성 40% 향상 기여.
+              </p>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">2023.06 ~ 2023.12</div>
+            <div class="timeline-card">
+              <h3 class="timeline-title">풀스택 웹 개발 부트캠프 수료</h3>
+              <p class="timeline-company">코드 아카데미 | 6개월 과정</p>
+              <p class="timeline-desc">
+                HTML, CSS, JavaScript, React, Node.js 기반의 웹 서비스 풀스택 프로젝트 3회 완수 및 우수 프로젝트상 수상.
+              </p>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">2019.03 ~ 2023.02</div>
+            <div class="timeline-card">
+              <h3 class="timeline-title">컴퓨터공학과 졸업</h3>
+              <p class="timeline-company">한국대학교</p>
+              <p class="timeline-desc">
+                알고리즘, 자료구조, 소프트웨어 공학, 네트워크 및 데이터베이스 등 컴퓨터 사이언스 기초 이론 습득.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== Footer ==================== -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-logo">
+        <span class="logo-accent">&lt;</span>Dev.Profile<span class="logo-accent">/&gt;</span>
+      </div>
+      <p class="footer-copy">&copy; 2026 홍길동 (Hong Gil-Dong). All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#header" class="back-to-top" title="맨 위로 이동">
+          <i class="fa-solid fa-arrow-up"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="alert"></div>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+</body>
+</html>
