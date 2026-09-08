@@ -13,9 +13,10 @@
     GAS_URL: 'devlog_gas_url'
   };
 
-  // Google Apps Script Web App 배포 URL
-  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyHa1hjkwMAohPU7_qUqn3A51eAxOPiy02w9Ihc2vYapKpQJ1Rpfv_YpD2_n8cNHJIuTg/exec';
-  let GAS_API_URL = localStorage.getItem(STORAGE_KEYS.GAS_URL) || DEFAULT_GAS_URL;
+  // Google Apps Script Web App 배포 URL (최신)
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzm7IlrgGUe8kL0o5_xbaQAltY-i_h3h1j1HO_7TmEdLYw-C8ixzDD_tJebWJmm2-4TVg/exec';
+  let GAS_API_URL = DEFAULT_GAS_URL;
+  localStorage.setItem(STORAGE_KEYS.GAS_URL, DEFAULT_GAS_URL);
 
   // 1. 스토리지 초기화
   function initStorage() {

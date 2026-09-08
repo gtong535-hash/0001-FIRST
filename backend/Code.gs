@@ -68,12 +68,11 @@ function doPost(e) {
       });
     }
 
-    const sheet = SS.getSheetByName('users');
+    let sheet = SS.getSheetByName('users');
     if (!sheet) {
-      return createJsonResponse({ 
-        success: false, 
-        message: "'users' 시트가 존재하지 않습니다. setupUsersSheet를 먼저 실행해 주세요." 
-      });
+      // users 시트가 없으면 자동으로 생성 및 헤더 세팅
+      setupUsersSheet();
+      sheet = SS.getSheetByName('users');
     }
 
     const allUsers = getAllUsersData(sheet);
