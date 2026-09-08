@@ -520,16 +520,38 @@
     },
     async sendToSheet(action, data) {
       if (!GAS_API_URL) return { success: false, offline: true };
+
+      // 3.5초 타임아웃 설정 (구글 시트 응답 지연 시 빠른 로컬 폴백)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+
       try {
         const res = await fetch(GAS_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action, data })
+          body: JSON.stringify({ action, data }),
+          signal: controller.signal
         });
-        return await res.json();
+        clearTimeout(timeoutId);
+
+        const text = await res.text();
+
+        // 구글 로그인 또는 권한 에러 HTML 페이지가 반환된 경우
+        if (text.trim().startsWith('<') || text.includes('액세스 권한 필요') || text.includes('accounts.google.com')) {
+          console.warn('⚠️ Google Apps Script가 권한 제한(로그인 필요) 상태입니다. 로컬 저장소로 안전하게 전환합니다.');
+          return { success: false, offline: true, reason: 'AUTH_REQUIRED' };
+        }
+
+        try {
+          return JSON.parse(text);
+        } catch (jsonErr) {
+          console.warn('⚠️ Google 응답 파싱 실패:', text);
+          return { success: false, offline: true, raw: text };
+        }
       } catch (err) {
-        console.warn('스프레드시트 전송 실패:', err);
-        return { success: false, error: err.toString() };
+        clearTimeout(timeoutId);
+        console.warn('⚠️ 스프레드시트 통신 실패 또는 타임아웃 (로컬 저장소 자동 전환):', err.message);
+        return { success: false, offline: true, error: err.toString() };
       }
     }
   };

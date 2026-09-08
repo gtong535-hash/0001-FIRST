@@ -2,8 +2,19 @@
 // DevLog 블로그 회원가입 & 로그인 백엔드 API (Google Apps Script)
 // ==========================================================================
 
-// 1. 스프레드시트 객체 참조 (스프레드시트에서 연 경우 활성 시트 자동 참조)
-const SS = SpreadsheetApp.getActiveSpreadsheet();
+// 1. 스프레드시트 객체 참조 (스프레드시트 연동형은 자동 참조, 독립형 스크립트인 경우 ID 입력 지원)
+const SPREADSHEET_ID = ""; // 비워두면 자동 참조, 독립형 프로젝트라면 스프레드시트 ID를 입력하세요.
+
+function getSpreadsheet() {
+  try {
+    const active = SpreadsheetApp.getActiveSpreadsheet();
+    if (active) return active;
+  } catch(e) {}
+  if (SPREADSHEET_ID) {
+    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  }
+  return null;
+}
 
 /**
  * [초기 설정 함수]
@@ -11,6 +22,11 @@ const SS = SpreadsheetApp.getActiveSpreadsheet();
  * 스프레드시트에 'users' 시트와 필요한 열(Header)을 자동으로 예쁘게 만들어 줍니다!
  */
 function setupUsersSheet() {
+  const SS = getSpreadsheet();
+  if (!SS) {
+    Logger.log("❌ 스프레드시트를 찾을 수 없습니다. SPREADSHEET_ID 변수에 스프레드시트 ID를 입력해 주세요.");
+    return;
+  }
   let sheet = SS.getSheetByName('users');
   if (!sheet) {
     sheet = SS.insertSheet('users');
@@ -43,6 +59,14 @@ function doPost(e) {
     const request = JSON.parse(e.postData.contents);
     const action = request.action;
     const data = request.data || {};
+
+    const SS = getSpreadsheet();
+    if (!SS) {
+      return createJsonResponse({ 
+        success: false, 
+        message: "스프레드시트를 연결할 수 없습니다. SPREADSHEET_ID를 확인해 주세요." 
+      });
+    }
 
     const sheet = SS.getSheetByName('users');
     if (!sheet) {
