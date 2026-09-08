@@ -223,7 +223,7 @@
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // Clear errors
@@ -281,24 +281,37 @@
 
         if (!isValid) return;
 
-        const result = BlogCore.Auth.signup({
-          email: email,
-          password: password,
-          nickname: nickname,
-          name: nameInput.value.trim() || nickname,
-          bio: bioInput.value.trim() || '안녕하세요! 개발을 사랑하는 블로거입니다.',
-          interests: selectedInterests.length > 0 ? selectedInterests : ['웹 개발']
-        });
+        const submitBtn = document.getElementById('btn-signup-submit');
+        const origText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 회원가입 처리 중...';
 
-        if (result.success) {
-          BlogCore.showToast(`🎉 가입을 환영합니다, ${result.user.nickname}님!`, 'success');
-          setTimeout(() => {
-            window.location.href = 'profile.html';
-          }, 800);
-        } else {
-          emailInput.classList.add('error');
-          emailError.textContent = result.message;
-          BlogCore.showToast(result.message, 'error');
+        try {
+          const result = await BlogCore.Auth.signup({
+            email: email,
+            password: password,
+            nickname: nickname,
+            name: nameInput.value.trim() || nickname,
+            bio: bioInput.value.trim() || '안녕하세요! 개발을 사랑하는 블로거입니다.',
+            interests: selectedInterests.length > 0 ? selectedInterests : ['웹 개발']
+          });
+
+          if (result.success) {
+            BlogCore.showToast(`🎉 가입을 환영합니다, ${result.user.nickname}님!`, 'success');
+            setTimeout(() => {
+              window.location.href = 'profile.html';
+            }, 800);
+          } else {
+            emailInput.classList.add('error');
+            emailError.textContent = result.message;
+            BlogCore.showToast(result.message, 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origText;
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origText;
+          BlogCore.showToast('회원가입 처리 중 오류가 발생했습니다.', 'error');
         }
       });
     });

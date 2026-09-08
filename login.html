@@ -170,7 +170,7 @@
         passwordError.textContent = '';
       }
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         clearErrors();
 
@@ -192,18 +192,31 @@
 
         if (hasError) return;
 
-        const result = BlogCore.Auth.login(email, password);
+        const submitBtn = document.getElementById('btn-login-submit');
+        const origText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 로그인 처리 중...';
 
-        if (result.success) {
-          BlogCore.showToast(`환영합니다, ${result.user.nickname || result.user.name}님!`, 'success');
-          setTimeout(() => {
-            const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'profile.html';
-            window.location.href = redirectUrl;
-          }, 600);
-        } else {
-          passwordInput.classList.add('error');
-          passwordError.textContent = result.message;
-          BlogCore.showToast(result.message, 'error');
+        try {
+          const result = await BlogCore.Auth.login(email, password);
+
+          if (result.success) {
+            BlogCore.showToast(`환영합니다, ${result.user.nickname || result.user.name}님!`, 'success');
+            setTimeout(() => {
+              const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'profile.html';
+              window.location.href = redirectUrl;
+            }, 600);
+          } else {
+            passwordInput.classList.add('error');
+            passwordError.textContent = result.message;
+            BlogCore.showToast(result.message, 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origText;
+          }
+        } catch (err) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origText;
+          BlogCore.showToast('로그인 중 오류가 발생했습니다.', 'error');
         }
       });
     });
