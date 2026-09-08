@@ -82,7 +82,11 @@
             localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(res.user));
             return { success: true, user: res.user };
           } else if (res && res.message && !res.offline) {
-            return { success: false, message: res.message };
+            if (res.message.includes('시트') || res.message.includes('setupUsersSheet')) {
+              console.warn('⚠️ 구글 시트 설정 미완료 감지 -> 로컬 저장소 DB로 로그인 시도합니다.');
+            } else {
+              return { success: false, message: res.message };
+            }
           }
         } catch (err) {
           console.warn('스프레드시트 로그인 연동 실패, 로컬 DB로 전환:', err);
@@ -118,7 +122,12 @@
             localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(res.user));
             return { success: true, user: res.user };
           } else if (res && res.message && !res.offline) {
-            return { success: false, message: res.message };
+            // 스프레드시트에 아직 users 시트가 없는 환경적인 문제라면 가입을 차단하지 않고 로컬 DB로 안전하게 진행!
+            if (res.message.includes('시트') || res.message.includes('setupUsersSheet')) {
+              console.warn('⚠️ 구글 시트 설정 미완료 감지 -> 로컬 저장소 DB로 안전하게 가입 처리합니다.');
+            } else {
+              return { success: false, message: res.message };
+            }
           }
         } catch (err) {
           console.warn('스프레드시트 회원가입 연동 실패, 로컬 DB로 전환:', err);

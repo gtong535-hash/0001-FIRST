@@ -3,7 +3,7 @@
 // ==========================================================================
 
 // 1. 스프레드시트 객체 참조 (스프레드시트 연동형은 자동 참조, 독립형 스크립트인 경우 ID 입력 지원)
-const SPREADSHEET_ID = ""; // 비워두면 자동 참조, 독립형 프로젝트라면 스프레드시트 ID를 입력하세요.
+const SPREADSHEET_ID = ""; // 필요한 경우 여기에 스프레드시트 ID를 입력하세요.
 
 function getSpreadsheet() {
   try {
@@ -11,39 +11,56 @@ function getSpreadsheet() {
     if (active) return active;
   } catch(e) {}
   if (SPREADSHEET_ID) {
-    return SpreadsheetApp.openById(SPREADSHEET_ID);
+    try {
+      return SpreadsheetApp.openById(SPREADSHEET_ID);
+    } catch(e) {}
   }
+  // 스프레드시트가 직접 연결되지 않은 독립 스크립트인 경우 드라이브의 첫 번째 시트 탐색
+  try {
+    const files = DriveApp.getFilesByType(MimeType.GOOGLE_SHEETS);
+    if (files.hasNext()) {
+      return SpreadsheetApp.open(files.next());
+    }
+  } catch(e) {}
   return null;
 }
 
 /**
- * [초기 설정 함수]
- * Apps Script 상단에서 'setupUsersSheet'를 선택하고 [실행]을 누르면,
- * 스프레드시트에 'users' 시트와 필요한 열(Header)을 자동으로 예쁘게 만들어 줍니다!
+ * [스마트 시트 생성 함수]
+ * users 시트가 없으면 자동으로 생성하고, 기본 시트1이 비어있으면 users로 자동 리네이밍합니다.
  */
 function setupUsersSheet() {
   const SS = getSpreadsheet();
   if (!SS) {
-    Logger.log("❌ 스프레드시트를 찾을 수 없습니다. SPREADSHEET_ID 변수에 스프레드시트 ID를 입력해 주세요.");
-    return;
+    Logger.log("❌ 스프레드시트를 찾을 수 없습니다. SPREADSHEET_ID를 설정하거나 스프레드시트 내부에서 열어주세요.");
+    return null;
   }
+
   let sheet = SS.getSheetByName('users');
   if (!sheet) {
-    sheet = SS.insertSheet('users');
+    const sheets = SS.getSheets();
+    // 시트1이 내용이 없으면 users로 이름 변경
+    if (sheets.length > 0 && sheets[0].getLastRow() <= 1) {
+      sheet = sheets[0];
+      sheet.setName('users');
+    } else {
+      sheet = SS.insertSheet('users');
+    }
   }
 
-  // 1행 헤더 구성
-  const headers = ['id', 'email', 'password', 'nickname', 'name', 'bio', 'avatar', 'interests', 'joinedAt'];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
-  
-  // 헤더 스타일 꾸미기 (배경색, 굵게)
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange.setFontWeight('bold');
-  headerRange.setBackground('#3b82f6');
-  headerRange.setFontColor('#ffffff');
-  sheet.setFrozenRows(1);
+  // 1행 헤더가 비어있으면 자동 설정
+  if (sheet.getLastRow() === 0) {
+    const headers = ['id', 'email', 'password', 'nickname', 'name', 'bio', 'avatar', 'interests', 'joinedAt'];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    const headerRange = sheet.getRange(1, 1, 1, headers.length);
+    headerRange.setFontWeight('bold');
+    headerRange.setBackground('#3b82f6');
+    headerRange.setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+  }
 
-  Logger.log("✅ 'users' 시트 설정이 성공적으로 완료되었습니다!");
+  Logger.log("✅ 'users' 시트 준비 완료!");
+  return sheet;
 }
 
 /**
