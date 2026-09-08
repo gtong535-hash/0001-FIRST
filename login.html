@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevLog 로그인 - 생각과 코드를 기록하는 개발 블로그">
+  <title>로그인 | DevLog</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Header / Navbar ==================== -->
+  <header id="header" class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="posts.html" class="nav-link">게시글</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li><a href="skills.html" class="nav-link">기술</a></li>
+          <li><a href="projects.html" class="nav-link">프로젝트</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth & Actions -->
+      <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
+        <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="btn-icon hamburger" aria-label="메뉴 열기" title="메뉴 열기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <a href="index.html" class="auth-logo">
+          <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+        </a>
+        <h1 class="auth-title">로그인</h1>
+        <p class="auth-subtitle">DevLog에 오신 것을 환영합니다. 계정에 로그인하세요.</p>
+      </div>
+
+      <!-- Quick Demo Login Helper Box -->
+      <div class="demo-account-box">
+        <div class="demo-account-title"><i class="fa-solid fa-wand-magic-sparkles"></i> 빠른 체험용 데모 계정</div>
+        <p class="demo-account-desc">클릭 한 번으로 데모 계정 정보를 자동 입력할 수 있습니다.</p>
+        <div style="display: flex; gap: 8px; justify-content: center;">
+          <button type="button" id="btn-fill-admin" class="btn btn-sm btn-outline">
+            운영자 (홍길동)
+          </button>
+          <button type="button" id="btn-fill-guest" class="btn btn-sm btn-outline">
+            게스트 (김방문)
+          </button>
+        </div>
+      </div>
+
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="form-group">
+          <label for="login-email" class="form-label">이메일 주소</label>
+          <input 
+            type="email" 
+            id="login-email" 
+            class="form-input" 
+            placeholder="example@domain.com" 
+            required 
+            autocomplete="email"
+          />
+          <span id="login-email-error" class="form-error"></span>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="login-password" class="form-label" style="margin-bottom: 0;">비밀번호</label>
+            <a href="#" onclick="alert('데모 환경입니다. 기본 비밀번호는 password123 입니다.'); return false;" style="font-size: 0.78rem; color: var(--primary);">비밀번호 찾기</a>
+          </div>
+          <input 
+            type="password" 
+            id="login-password" 
+            class="form-input" 
+            placeholder="비밀번호를 입력하세요" 
+            required 
+            autocomplete="current-password"
+          />
+          <span id="login-password-error" class="form-error"></span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
+          <input type="checkbox" id="remember-me" checked />
+          <label for="remember-me">로그인 상태 유지</label>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn btn-primary btn-full">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> 로그인
+        </button>
+      </form>
+
+      <div class="auth-bottom-links">
+        아직 계정이 없으신가요? 
+        <a href="signup.html">회원가입하기</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </div>
+      <p class="footer-copy">&copy; 2024 DevLog. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 이미 로그인되어 있으면 프로필 페이지로 이동 여부 확인
+      if (BlogCore.Auth.getCurrentUser()) {
+        BlogCore.showToast('이미 로그인되어 있습니다.');
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 800);
+        return;
+      }
+
+      const form = document.getElementById('login-form');
+      const emailInput = document.getElementById('login-email');
+      const passwordInput = document.getElementById('login-password');
+      const emailError = document.getElementById('login-email-error');
+      const passwordError = document.getElementById('login-password-error');
+
+      // 데모 계정 자동완성 버튼
+      document.getElementById('btn-fill-admin').addEventListener('click', () => {
+        emailInput.value = 'hong@example.com';
+        passwordInput.value = 'password123';
+        clearErrors();
+      });
+
+      document.getElementById('btn-fill-guest').addEventListener('click', () => {
+        emailInput.value = 'guest@example.com';
+        passwordInput.value = 'password123';
+        clearErrors();
+      });
+
+      function clearErrors() {
+        emailInput.classList.remove('error');
+        passwordInput.classList.remove('error');
+        emailError.textContent = '';
+        passwordError.textContent = '';
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        let hasError = false;
+
+        if (!email) {
+          emailInput.classList.add('error');
+          emailError.textContent = '이메일을 입력해 주세요.';
+          hasError = true;
+        }
+
+        if (!password) {
+          passwordInput.classList.add('error');
+          passwordError.textContent = '비밀번호를 입력해 주세요.';
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        const result = BlogCore.Auth.login(email, password);
+
+        if (result.success) {
+          BlogCore.showToast(`환영합니다, ${result.user.nickname || result.user.name}님!`, 'success');
+          setTimeout(() => {
+            const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'profile.html';
+            window.location.href = redirectUrl;
+          }, 600);
+        } else {
+          passwordInput.classList.add('error');
+          passwordError.textContent = result.message;
+          BlogCore.showToast(result.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevLog 게시글 작성 및 편집 에디터">
+  <title>새 글 작성 | DevLog</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Header / Navbar ==================== -->
+  <header id="header" class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="posts.html" class="nav-link">게시글</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li><a href="skills.html" class="nav-link">기술</a></li>
+          <li><a href="projects.html" class="nav-link">프로젝트</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth & Actions -->
+      <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
+        <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="btn-icon hamburger" aria-label="메뉴 열기" title="메뉴 열기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <div class="write-container">
+
+      <div class="editor-card">
+        <!-- Editor Header Bar -->
+        <div class="editor-header-bar">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="posts.html" class="btn btn-outline btn-sm" title="돌아가기">
+              <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <h1 style="font-size: 1.3rem; font-weight: 700; margin: 0;" id="editor-page-title">새 글 작성</h1>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" id="btn-load-draft" class="btn btn-outline btn-sm" title="임시저장된 글 불러오기">
+              <i class="fa-solid fa-clock-rotate-left"></i> 임시저장 불러오기
+            </button>
+          </div>
+        </div>
+
+        <form id="write-form" novalidate>
+          <!-- Title Input -->
+          <input 
+            type="text" 
+            id="post-title" 
+            class="editor-title-input" 
+            placeholder="제목을 입력하세요..." 
+            required 
+          />
+
+          <!-- Category & Tags Grid -->
+          <div class="editor-meta-grid">
+            <div>
+              <select id="post-category" class="editor-category-select" required>
+                <option value="frontend" data-name="프론트엔드">프론트엔드 (Frontend)</option>
+                <option value="css" data-name="CSS & UI">CSS & UI</option>
+                <option value="backend" data-name="백엔드 & CS">백엔드 & CS</option>
+                <option value="performance" data-name="성능 최적화">성능 최적화</option>
+                <option value="devlife" data-name="개발 이야기">개발 이야기</option>
+              </select>
+            </div>
+            <div>
+              <input 
+                type="text" 
+                id="post-tags" 
+                class="editor-input" 
+                placeholder="태그를 쉼표(,)로 구분하여 입력 (예: React, TypeScript, 최적화)" 
+              />
+            </div>
+          </div>
+
+          <!-- Cover Image Input (Optional) -->
+          <div style="margin-bottom: 20px;">
+            <input 
+              type="url" 
+              id="post-cover" 
+              class="editor-input" 
+              placeholder="커버 이미지 URL (선택사항, 미입력 시 멋진 개발 테마 기본 이미지가 적용됩니다)" 
+            />
+          </div>
+
+          <!-- Editor Toolbar -->
+          <div class="editor-toolbar">
+            <button type="button" class="toolbar-btn" data-tool="h2" title="큰 제목 (H2)"><i class="fa-solid fa-heading"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="h3" title="중간 제목 (H3)"><i class="fa-solid fa-h"></i></button>
+            <div class="toolbar-divider"></div>
+            <button type="button" class="toolbar-btn" data-tool="bold" title="굵게"><i class="fa-solid fa-bold"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="italic" title="기울임"><i class="fa-solid fa-italic"></i></button>
+            <div class="toolbar-divider"></div>
+            <button type="button" class="toolbar-btn" data-tool="quote" title="인용문"><i class="fa-solid fa-quote-left"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="code" title="코드 블록"><i class="fa-solid fa-code"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="list" title="글머리 기호"><i class="fa-solid fa-list-ul"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="link" title="링크 추가"><i class="fa-solid fa-link"></i></button>
+            <button type="button" class="toolbar-btn" data-tool="hr" title="구분선"><i class="fa-solid fa-minus"></i></button>
+
+            <!-- Mode Tabs (Edit vs Preview) -->
+            <div class="editor-tab-nav">
+              <button type="button" class="editor-tab-btn active" id="tab-write-btn">
+                <i class="fa-solid fa-pen"></i> 작성
+              </button>
+              <button type="button" class="editor-tab-btn" id="tab-preview-btn">
+                <i class="fa-regular fa-eye"></i> 미리보기
+              </button>
+            </div>
+          </div>
+
+          <!-- Textarea (Write) -->
+          <textarea 
+            id="post-content" 
+            class="editor-textarea" 
+            placeholder="마크다운(Markdown) 문법을 지원합니다. 자유롭게 당신의 개발 인사이트와 코드를 작성해 보세요...
+
+## 주요 구현 내용
+- 핵심 개념 설명
+- 실무 적용 팁
+
+```javascript
+const greet = 'Hello DevLog!';
+console.log(greet);
+```" 
+            required
+          ></textarea>
+
+          <!-- Preview Pane -->
+          <div id="post-preview-pane" class="editor-preview-pane post-detail-content">
+            <!-- Rendered preview markdown -->
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="editor-footer-actions">
+            <button type="button" id="btn-save-draft" class="btn btn-outline">
+              <i class="fa-regular fa-floppy-disk"></i> 임시저장
+            </button>
+            <a href="posts.html" class="btn btn-outline">
+              취소
+            </a>
+            <button type="submit" id="btn-publish-post" class="btn btn-primary">
+              <i class="fa-solid fa-paper-plane"></i> 게시하기
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </div>
+      <p class="footer-copy">&copy; 2024 DevLog. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const editPostId = urlParams.get('edit');
+
+      const titleInput = document.getElementById('post-title');
+      const categorySelect = document.getElementById('post-category');
+      const tagsInput = document.getElementById('post-tags');
+      const coverInput = document.getElementById('post-cover');
+      const contentTextarea = document.getElementById('post-content');
+      const previewPane = document.getElementById('post-preview-pane');
+
+      const tabWriteBtn = document.getElementById('tab-write-btn');
+      const tabPreviewBtn = document.getElementById('tab-preview-btn');
+      const writeForm = document.getElementById('write-form');
+      const btnSaveDraft = document.getElementById('btn-save-draft');
+      const btnLoadDraft = document.getElementById('btn-load-draft');
+      const pageTitle = document.getElementById('editor-page-title');
+
+      // 수정 모드일 때 기존 데이터 불러오기
+      if (editPostId) {
+        const existingPost = BlogCore.Post.getById(editPostId);
+        if (existingPost) {
+          pageTitle.textContent = '게시글 수정';
+          document.title = `게시글 수정 | DevLog`;
+          titleInput.value = existingPost.title || '';
+          categorySelect.value = existingPost.category || 'frontend';
+          tagsInput.value = (existingPost.tags || []).join(', ');
+          coverInput.value = existingPost.coverImage || '';
+          contentTextarea.value = existingPost.content || '';
+        }
+      }
+
+      // 탭 전환 (작성 vs 미리보기)
+      tabWriteBtn.addEventListener('click', () => {
+        tabWriteBtn.classList.add('active');
+        tabPreviewBtn.classList.remove('active');
+        contentTextarea.style.display = 'block';
+        previewPane.classList.remove('active');
+      });
+
+      tabPreviewBtn.addEventListener('click', () => {
+        tabPreviewBtn.classList.add('active');
+        tabWriteBtn.classList.remove('active');
+        contentTextarea.style.display = 'none';
+        previewPane.classList.add('active');
+
+        // Render preview
+        const rawContent = contentTextarea.value.trim() || '*작성된 내용이 없습니다.*';
+        previewPane.innerHTML = BlogCore.parseSimpleMarkdown(rawContent);
+      });
+
+      // 툴바 버튼 핸들러
+      const toolbarButtons = document.querySelectorAll('.toolbar-btn[data-tool]');
+      toolbarButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tool = btn.getAttribute('data-tool');
+          insertFormatting(tool);
+        });
+      });
+
+      function insertFormatting(tool) {
+        const start = contentTextarea.selectionStart;
+        const end = contentTextarea.selectionEnd;
+        const selected = contentTextarea.value.substring(start, end);
+        let replacement = '';
+
+        switch (tool) {
+          case 'h2':
+            replacement = `\n## ${selected || '소제목'}\n`;
+            break;
+          case 'h3':
+            replacement = `\n### ${selected || '세부 제목'}\n`;
+            break;
+          case 'bold':
+            replacement = `**${selected || '굵은 텍스트'}**`;
+            break;
+          case 'italic':
+            replacement = `*${selected || '기울임 텍스트'}*`;
+            break;
+          case 'quote':
+            replacement = `\n> ${selected || '인용할 문장'}\n`;
+            break;
+          case 'code':
+            replacement = `\n\`\`\`javascript\n${selected || '// 코드를 여기에 작성하세요'}\n\`\`\`\n`;
+            break;
+          case 'list':
+            replacement = `\n- ${selected || '목록 아이템 1'}\n- 목록 아이템 2\n`;
+            break;
+          case 'link':
+            replacement = `[${selected || '링크 텍스트'}](https://)`;
+            break;
+          case 'hr':
+            replacement = `\n---\n`;
+            break;
+        }
+
+        contentTextarea.setRangeText(replacement, start, end, 'end');
+        contentTextarea.focus();
+      }
+
+      // 임시저장
+      btnSaveDraft.addEventListener('click', () => {
+        const draft = {
+          title: titleInput.value,
+          category: categorySelect.value,
+          tags: tagsInput.value,
+          cover: coverInput.value,
+          content: contentTextarea.value,
+          savedAt: new Date().toLocaleTimeString()
+        };
+        localStorage.setItem('devlog_draft', JSON.stringify(draft));
+        BlogCore.showToast(`[${draft.savedAt}] 임시저장 완료!`, 'success');
+      });
+
+      // 임시저장 불러오기
+      btnLoadDraft.addEventListener('click', () => {
+        const draftStr = localStorage.getItem('devlog_draft');
+        if (!draftStr) {
+          BlogCore.showToast('저장된 임시 글이 없습니다.', 'info');
+          return;
+        }
+
+        if (confirm('임시저장된 내용을 불러오시겠습니까? 현재 작성 중인 내용은 덮어씌워집니다.')) {
+          const draft = JSON.parse(draftStr);
+          titleInput.value = draft.title || '';
+          categorySelect.value = draft.category || 'frontend';
+          tagsInput.value = draft.tags || '';
+          coverInput.value = draft.cover || '';
+          contentTextarea.value = draft.content || '';
+          BlogCore.showToast('임시저장 내용을 성공적으로 불러왔습니다.', 'success');
+        }
+      });
+
+      // 폼 제출 (게시하기)
+      writeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const title = titleInput.value.trim();
+        const content = contentTextarea.value.trim();
+        const category = categorySelect.value;
+        const selectedOpt = categorySelect.options[categorySelect.selectedIndex];
+        const categoryName = selectedOpt.getAttribute('data-name') || selectedOpt.text;
+        const tags = tagsInput.value.split(',').map(s => s.trim()).filter(Boolean);
+        const coverImage = coverInput.value.trim();
+
+        if (!title) {
+          BlogCore.showToast('게시글 제목을 입력해 주세요.', 'error');
+          titleInput.focus();
+          return;
+        }
+
+        if (!content) {
+          BlogCore.showToast('본문 내용을 입력해 주세요.', 'error');
+          contentTextarea.focus();
+          return;
+        }
+
+        const postPayload = {
+          title,
+          category,
+          categoryName,
+          tags: tags.length > 0 ? tags : ['Dev'],
+          coverImage: coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop',
+          content
+        };
+
+        if (editPostId) {
+          // 수정
+          const updated = BlogCore.Post.update(editPostId, postPayload);
+          if (updated) {
+            localStorage.removeItem('devlog_draft');
+            BlogCore.showToast('게시글이 성공적으로 수정되었습니다!', 'success');
+            setTimeout(() => {
+              window.location.href = `post-detail.html?id=${updated.id}`;
+            }, 700);
+          }
+        } else {
+          // 신규 작성
+          const newPost = BlogCore.Post.create(postPayload);
+          localStorage.removeItem('devlog_draft');
+          BlogCore.showToast('새 게시글이 성공적으로 등록되었습니다!', 'success');
+          setTimeout(() => {
+            window.location.href = `post-detail.html?id=${newPost.id}`;
+          }, 700);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

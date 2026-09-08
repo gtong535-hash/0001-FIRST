@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevLog 사용자 프로필 및 활동 관리">
+  <title>프로필 | DevLog</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Header / Navbar ==================== -->
+  <header id="header" class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="posts.html" class="nav-link">게시글</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li><a href="skills.html" class="nav-link">기술</a></li>
+          <li><a href="projects.html" class="nav-link">프로젝트</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth & Actions -->
+      <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
+        <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="btn-icon hamburger" aria-label="메뉴 열기" title="메뉴 열기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <!-- Profile Page Header Banner -->
+    <section class="profile-page-header">
+      <div class="container">
+        <div class="profile-card-top" id="profile-card-top">
+          <!-- Profile Top Info Rendered via JS -->
+          <img src="assets/images/profile.jpg" alt="프로필 아바타" class="profile-avatar-large" id="prof-avatar">
+          <div class="profile-main-info">
+            <h1 class="profile-user-nickname" id="prof-nickname">홍길동</h1>
+            <p class="profile-user-email" id="prof-email">hong@example.com</p>
+            <p class="profile-user-bio" id="prof-bio">
+              기록하고 공유하며 성장하는 프론트엔드 개발자입니다. 모던 웹 기술과 클린 아키텍처에 관심이 많습니다.
+            </p>
+            <div class="profile-user-tags" id="prof-tags">
+              <span class="post-card-tag">React</span>
+              <span class="post-card-tag">TypeScript</span>
+              <span class="post-card-tag">Next.js</span>
+            </div>
+          </div>
+          <div class="profile-top-actions">
+            <a href="write.html" class="btn btn-primary">
+              <i class="fa-solid fa-pen-nib"></i> 새 글 작성
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Main Body -->
+    <section class="section" style="padding-top: 24px;">
+      <div class="container">
+
+        <!-- Stats Overview Cards -->
+        <div class="profile-stats-cards">
+          <div class="stat-metric-card">
+            <div class="stat-number" id="stat-posts-count">0</div>
+            <div class="stat-label">작성한 게시글</div>
+          </div>
+          <div class="stat-metric-card">
+            <div class="stat-number" id="stat-likes-count">0</div>
+            <div class="stat-label">좋아요 누른 글</div>
+          </div>
+          <div class="stat-metric-card">
+            <div class="stat-number" id="stat-comments-count">0</div>
+            <div class="stat-label">작성한 댓글</div>
+          </div>
+          <div class="stat-metric-card">
+            <div class="stat-number" id="stat-days-count">30</div>
+            <div class="stat-label">활동 일수</div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="profile-tabs-nav" id="profile-tabs-nav">
+          <div class="profile-tab-item active" data-target="tab-my-posts">
+            <i class="fa-solid fa-newspaper"></i> 내가 쓴 글 (<span id="tab-posts-badge">0</span>)
+          </div>
+          <div class="profile-tab-item" data-target="tab-liked-posts">
+            <i class="fa-solid fa-heart"></i> 좋아요한 글 (<span id="tab-likes-badge">0</span>)
+          </div>
+          <div class="profile-tab-item" data-target="tab-edit-profile">
+            <i class="fa-solid fa-user-pen"></i> 프로필 정보 수정
+          </div>
+        </div>
+
+        <!-- Tab 1: My Posts -->
+        <div class="profile-tab-content active" id="tab-my-posts">
+          <div id="my-posts-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Liked Posts -->
+        <div class="profile-tab-content" id="tab-liked-posts">
+          <div id="liked-posts-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Edit Profile Form -->
+        <div class="profile-tab-content" id="tab-edit-profile">
+          <div style="max-width: 600px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">프로필 기본 정보 수정</h3>
+            <form id="edit-profile-form" novalidate>
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="edit-nickname" class="form-label">닉네임</label>
+                <input type="text" id="edit-nickname" class="form-input" required />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="edit-bio" class="form-label">한 줄 소개</label>
+                <textarea id="edit-bio" class="form-input" rows="3" style="resize: vertical;"></textarea>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 18px;">
+                <label for="edit-github" class="form-label">GitHub 주소</label>
+                <input type="url" id="edit-github" class="form-input" placeholder="https://github.com/..." />
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px;">
+                <label for="edit-interests" class="form-label">관심 기술 태그 (쉼표로 구분)</label>
+                <input type="text" id="edit-interests" class="form-input" placeholder="React, TypeScript, CSS" />
+              </div>
+
+              <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-check"></i> 변경사항 저장
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </div>
+      <p class="footer-copy">&copy; 2024 DevLog. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentUser = BlogCore.Auth.getCurrentUser();
+
+      // 로그인 안 되어 있을 경우 데모 안내 또는 로그인 페이지 이동 안내
+      if (!currentUser) {
+        // 기본으로 첫 번째 관리자 유저 정보 표시하되 비로그인 알림
+        const users = BlogCore.Auth.getUsers();
+        currentUser = users[0] || {
+          id: 'guest',
+          nickname: '게스트 사용자',
+          email: 'guest@example.com',
+          bio: '로그인하시면 나만의 글 작성과 프로필 관리를 하실 수 있습니다.',
+          avatar: 'assets/images/profile.jpg',
+          interests: ['JavaScript', 'HTML/CSS']
+        };
+
+        const topActions = document.querySelector('.profile-top-actions');
+        if (topActions) {
+          topActions.innerHTML = `
+            <a href="login.html?redirect=profile.html" class="btn btn-primary">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i> 로그인하여 내 프로필 관리
+            </a>
+          `;
+        }
+      }
+
+      // 프로필 헤더 렌더링
+      document.getElementById('prof-avatar').src = currentUser.avatar || 'assets/images/profile.jpg';
+      document.getElementById('prof-nickname').textContent = currentUser.nickname || currentUser.name;
+      document.getElementById('prof-email').textContent = currentUser.email;
+      document.getElementById('prof-bio').textContent = currentUser.bio || '작성된 소개글이 없습니다.';
+
+      // 태그 렌더링
+      const tagsContainer = document.getElementById('prof-tags');
+      const interests = currentUser.interests || ['Web Development'];
+      tagsContainer.innerHTML = interests.map(t => `<span class="post-card-tag">${t}</span>`).join('');
+
+      // 수정 폼 기본값 채우기
+      const editNickname = document.getElementById('edit-nickname');
+      const editBio = document.getElementById('edit-bio');
+      const editGithub = document.getElementById('edit-github');
+      const editInterests = document.getElementById('edit-interests');
+
+      if (editNickname) editNickname.value = currentUser.nickname || currentUser.name || '';
+      if (editBio) editBio.value = currentUser.bio || '';
+      if (editGithub) editGithub.value = currentUser.github || '';
+      if (editInterests) editInterests.value = (currentUser.interests || []).join(', ');
+
+      // 통계 및 탭 데이터 로드
+      loadProfileData(currentUser);
+
+      // 탭 전환 이벤트
+      const tabItems = document.querySelectorAll('.profile-tab-item');
+      tabItems.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabItems.forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+
+          tab.classList.add('active');
+          const targetId = tab.getAttribute('data-target');
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) targetEl.classList.add('active');
+        });
+      });
+
+      // 프로필 수정 제출 이벤트
+      const editForm = document.getElementById('edit-profile-form');
+      if (editForm) {
+        editForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!BlogCore.Auth.getCurrentUser()) {
+            BlogCore.showToast('프로필 수정을 위해 먼저 로그인해 주세요.', 'error');
+            return;
+          }
+
+          const newNickname = editNickname.value.trim();
+          const newBio = editBio.value.trim();
+          const newGithub = editGithub.value.trim();
+          const newInterests = editInterests.value.split(',').map(s => s.trim()).filter(Boolean);
+
+          if (!newNickname) {
+            BlogCore.showToast('닉네임을 입력해 주세요.', 'error');
+            return;
+          }
+
+          const res = BlogCore.Auth.updateProfile({
+            nickname: newNickname,
+            bio: newBio,
+            github: newGithub,
+            interests: newInterests
+          });
+
+          if (res.success) {
+            BlogCore.showToast('프로필 정보가 성공적으로 변경되었습니다!', 'success');
+            document.getElementById('prof-nickname').textContent = newNickname;
+            document.getElementById('prof-bio').textContent = newBio;
+            tagsContainer.innerHTML = newInterests.map(t => `<span class="post-card-tag">${t}</span>`).join('');
+            BlogCore.initBlogNavbar();
+          } else {
+            BlogCore.showToast(res.message, 'error');
+          }
+        });
+      }
+    });
+
+    function loadProfileData(user) {
+      const allPosts = BlogCore.Post.getAll();
+      const myPosts = allPosts.filter(p => p.authorId === user.id || (!user.id && p.authorName === user.nickname));
+      const likedPosts = BlogCore.Post.getLikedPosts();
+      const allComments = BlogCore.Comment.getAll();
+      const myComments = allComments.filter(c => c.userId === user.id);
+
+      // 통계 숫자 갱신
+      document.getElementById('stat-posts-count').textContent = myPosts.length;
+      document.getElementById('stat-likes-count').textContent = likedPosts.length;
+      document.getElementById('stat-comments-count').textContent = myComments.length;
+
+      document.getElementById('tab-posts-badge').textContent = myPosts.length;
+      document.getElementById('tab-likes-badge').textContent = likedPosts.length;
+
+      // 1. 내가 쓴 글 렌더링
+      const myPostsContainer = document.getElementById('my-posts-container');
+      if (myPosts.length === 0) {
+        myPostsContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-regular fa-file-lines empty-state-icon"></i>
+            <h4 class="empty-state-title">아직 작성한 게시글이 없습니다</h4>
+            <p>당신의 지식과 경험을 첫 번째 글로 작성해 보세요!</p>
+            <a href="write.html" class="btn btn-primary" style="margin-top: 16px;">
+              <i class="fa-solid fa-pen-nib"></i> 첫 글 작성하기
+            </a>
+          </div>
+        `;
+      } else {
+        myPostsContainer.innerHTML = myPosts.map(post => `
+          <div class="my-post-item" id="post-row-${post.id}">
+            <div class="my-post-info">
+              <a href="post-detail.html?id=${post.id}">
+                <h4 class="my-post-title">${post.title}</h4>
+              </a>
+              <div class="my-post-meta">
+                <span><i class="fa-regular fa-calendar"></i> ${post.createdAt}</span>
+                <span><i class="fa-regular fa-eye"></i> ${post.views}</span>
+                <span><i class="fa-regular fa-heart"></i> ${post.likes}</span>
+                <span class="post-card-tag" style="padding: 1px 6px;">${post.categoryName}</span>
+              </div>
+            </div>
+            <div class="my-post-actions">
+              <a href="write.html?edit=${post.id}" class="btn btn-sm btn-outline" title="수정">
+                <i class="fa-solid fa-pen"></i> 수정
+              </a>
+              <button onclick="handleDeletePost(${post.id})" class="btn btn-sm btn-outline" style="color: #ef4444;" title="삭제">
+                <i class="fa-solid fa-trash-can"></i> 삭제
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 2. 좋아요한 글 렌더링
+      const likedContainer = document.getElementById('liked-posts-container');
+      if (likedPosts.length === 0) {
+        likedContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-regular fa-heart empty-state-icon"></i>
+            <h4 class="empty-state-title">좋아요를 누른 글이 없습니다</h4>
+            <p>관심 있는 기술 글을 읽고 하트를 눌러 보관해 보세요.</p>
+            <a href="posts.html" class="btn btn-outline" style="margin-top: 16px;">
+              <i class="fa-solid fa-compass"></i> 게시글 둘러보기
+            </a>
+          </div>
+        `;
+      } else {
+        likedContainer.innerHTML = likedPosts.map(post => `
+          <div class="my-post-item">
+            <div class="my-post-info">
+              <a href="post-detail.html?id=${post.id}">
+                <h4 class="my-post-title">${post.title}</h4>
+              </a>
+              <div class="my-post-meta">
+                <span><i class="fa-regular fa-user"></i> ${post.authorName}</span>
+                <span><i class="fa-regular fa-calendar"></i> ${post.createdAt}</span>
+                <span><i class="fa-solid fa-heart" style="color: #ef4444;"></i> ${post.likes}</span>
+              </div>
+            </div>
+            <div class="my-post-actions">
+              <a href="post-detail.html?id=${post.id}" class="btn btn-sm btn-outline">
+                <i class="fa-solid fa-arrow-right"></i> 글 읽기
+              </a>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function handleDeletePost(postId) {
+      if (confirm('정말로 이 게시글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.')) {
+        BlogCore.Post.delete(postId);
+        BlogCore.showToast('게시글이 삭제되었습니다.', 'info');
+        const user = BlogCore.Auth.getCurrentUser();
+        if (user) loadProfileData(user);
+      }
+    }
+  </script>
+</body>
+</html>

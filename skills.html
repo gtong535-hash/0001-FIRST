@@ -18,21 +18,25 @@
   <header id="header" class="navbar">
     <div class="container nav-container">
       <a href="index.html" class="nav-logo">
-        <span class="logo-accent">&lt;</span>Dev.Profile<span class="logo-accent">/&gt;</span>
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
       </a>
 
       <!-- Navigation Links -->
       <nav class="nav-menu" id="nav-menu">
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="posts.html" class="nav-link">게시글</a></li>
           <li><a href="about.html" class="nav-link">소개</a></li>
           <li><a href="skills.html" class="nav-link active">기술</a></li>
           <li><a href="projects.html" class="nav-link">프로젝트</a></li>
         </ul>
       </nav>
 
-      <!-- Actions -->
+      <!-- Auth & Actions -->
       <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
         <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -149,6 +153,8 @@
   <div id="toast" class="toast" role="alert"></div>
 
   <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

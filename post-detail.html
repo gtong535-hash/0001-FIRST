@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DevLog 기술 블로그 게시글 상세 보기">
+  <title>게시글 상세 | DevLog</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==================== Header / Navbar ==================== -->
+  <header id="header" class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">홈</a></li>
+          <li><a href="posts.html" class="nav-link active">게시글</a></li>
+          <li><a href="about.html" class="nav-link">소개</a></li>
+          <li><a href="skills.html" class="nav-link">기술</a></li>
+          <li><a href="projects.html" class="nav-link">프로젝트</a></li>
+        </ul>
+      </nav>
+
+      <!-- Auth & Actions -->
+      <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
+        <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="mobile-menu-btn" class="btn-icon hamburger" aria-label="메뉴 열기" title="메뉴 열기">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+      
+      <!-- Back Link -->
+      <div style="margin-bottom: 20px;">
+        <a href="posts.html" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-arrow-left"></i> 목록으로 돌아가기
+        </a>
+      </div>
+
+      <article class="post-detail-container" id="post-detail-container">
+        <!-- Rendered by JavaScript -->
+        <div style="text-align: center; padding: 100px 0;">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+          <p style="margin-top: 12px; color: var(--text-muted);">게시글을 불러오는 중입니다...</p>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-logo">
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
+      </div>
+      <p class="footer-copy">&copy; 2024 DevLog. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('id');
+
+      if (!postId) {
+        showNotFound('게시글 번호가 지정되지 않았습니다.');
+        return;
+      }
+
+      // 조회수 1 증가
+      BlogCore.Post.incrementViews(postId);
+
+      const post = BlogCore.Post.getById(postId);
+      if (!post) {
+        showNotFound('요청하신 게시글을 찾을 수 없습니다.');
+        return;
+      }
+
+      // 페이지 타이틀 변경
+      document.title = `${post.title} | DevLog`;
+
+      renderPostDetail(post);
+    });
+
+    function showNotFound(msg) {
+      const container = document.getElementById('post-detail-container');
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa-solid fa-circle-exclamation empty-state-icon"></i>
+          <h2 class="empty-state-title">${msg}</h2>
+          <p>삭제되었거나 잘못된 링크입니다.</p>
+          <a href="posts.html" class="btn btn-primary" style="margin-top: 16px;">
+            <i class="fa-solid fa-list"></i> 게시글 목록으로 이동
+          </a>
+        </div>
+      `;
+    }
+
+    function renderPostDetail(post) {
+      const container = document.getElementById('post-detail-container');
+      const currentUser = BlogCore.Auth.getCurrentUser();
+      const isAuthor = currentUser && (currentUser.id === post.authorId || currentUser.nickname === post.authorName);
+      const isLiked = BlogCore.Post.isPostLiked(post.id);
+
+      // 전체 게시글 중 이전글 / 다음글 찾기
+      const allPosts = BlogCore.Post.getAll();
+      const currentIndex = allPosts.findIndex(p => p.id === post.id);
+      const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+      const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+      // 본문 HTML 파싱
+      const parsedContent = BlogCore.parseSimpleMarkdown(post.content);
+
+      container.innerHTML = `
+        <!-- Post Header -->
+        <header class="post-detail-header">
+          <span class="post-detail-category">${post.categoryName || post.category}</span>
+          <h1 class="post-detail-title">${post.title}</h1>
+
+          <div class="post-detail-meta">
+            <div class="post-author-info">
+              <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="post-author-avatar">
+              <div>
+                <div class="post-author-name">${post.authorName}</div>
+                <div class="post-date-info">
+                  <span><i class="fa-regular fa-calendar"></i> ${post.createdAt}</span>
+                  <span>•</span>
+                  <span><i class="fa-regular fa-clock"></i> ${post.readTime || '5분'}</span>
+                  <span>•</span>
+                  <span><i class="fa-regular fa-eye"></i> 조회 ${post.views || 1}</span>
+                </div>
+              </div>
+            </div>
+
+            ${isAuthor ? `
+              <div class="post-header-actions">
+                <a href="write.html?edit=${post.id}" class="btn btn-sm btn-outline">
+                  <i class="fa-solid fa-pen"></i> 수정
+                </a>
+                <button onclick="handleDeleteDetailPost(${post.id})" class="btn btn-sm btn-outline" style="color: #ef4444;">
+                  <i class="fa-solid fa-trash-can"></i> 삭제
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        </header>
+
+        <!-- Post Cover Image -->
+        ${post.coverImage ? `
+          <img src="${post.coverImage}" alt="${post.title}" class="post-cover-img">
+        ` : ''}
+
+        <!-- Post Body Content -->
+        <section class="post-detail-content">
+          ${parsedContent}
+        </section>
+
+        <!-- Post Tags -->
+        <div class="post-card-tags" style="margin-bottom: 24px;">
+          ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" style="padding: 4px 12px; font-size: 0.85rem;">#${t}</a>`).join('')}
+        </div>
+
+        <!-- Action Bar: Like & Share -->
+        <div class="post-actions-bar">
+          <div class="action-btn-group">
+            <button id="like-btn" class="btn-post-action ${isLiked ? 'liked' : ''}" onclick="handleToggleLike(${post.id})">
+              <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+              <span id="like-count">${post.likes || 0}</span>
+            </button>
+            <button class="btn-post-action" onclick="handleCopyUrl()" title="링크 복사">
+              <i class="fa-solid fa-share-nodes"></i> 공유
+            </button>
+          </div>
+          <div>
+            <a href="write.html" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-pen-nib"></i> 새 글 쓰기
+            </a>
+          </div>
+        </div>
+
+        <!-- Author Profile Box -->
+        <div class="post-author-card">
+          <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-card-avatar">
+          <div>
+            <h4 class="author-card-name">${post.authorName}</h4>
+            <p class="author-card-bio">
+              기술의 깊이를 더하고 공유의 즐거움을 나누는 개발자입니다. 새로운 문제 해결과 클린 코드에 열정을 쏟고 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- Prev / Next Navigation -->
+        <div class="post-prev-next-nav">
+          ${prevPost ? `
+            <a href="post-detail.html?id=${prevPost.id}" class="nav-box">
+              <span class="nav-box-label"><i class="fa-solid fa-arrow-left"></i> 이전 글</span>
+              <div class="nav-box-title">${prevPost.title}</div>
+            </a>
+          ` : `
+            <div class="nav-box" style="opacity: 0.5; cursor: default;">
+              <span class="nav-box-label">이전 글이 없습니다</span>
+            </div>
+          `}
+
+          ${nextPost ? `
+            <a href="post-detail.html?id=${nextPost.id}" class="nav-box next">
+              <span class="nav-box-label">다음 글 <i class="fa-solid fa-arrow-right"></i></span>
+              <div class="nav-box-title">${nextPost.title}</div>
+            </a>
+          ` : `
+            <div class="nav-box next" style="opacity: 0.5; cursor: default;">
+              <span class="nav-box-label">최신 글입니다</span>
+            </div>
+          `}
+        </div>
+
+        <!-- Comments Section -->
+        <section class="comments-section" id="comments-section">
+          <div class="comments-header">
+            <h3 class="comments-title">
+              <i class="fa-regular fa-comment-dots"></i> 댓글 (<span id="comments-count">0</span>)
+            </h3>
+          </div>
+
+          <!-- Comment Write Form -->
+          <div class="comment-form-card">
+            <textarea id="comment-text-input" class="comment-input-area" placeholder="따뜻하고 건설적인 댓글을 남겨주세요..."></textarea>
+            <div class="comment-form-actions">
+              <div id="comment-user-box">
+                <!-- If guest, show name input -->
+              </div>
+              <button type="button" id="submit-comment-btn" class="btn btn-primary btn-sm" onclick="handleAddComment(${post.id})">
+                <i class="fa-regular fa-paper-plane"></i> 댓글 등록
+              </button>
+            </div>
+          </div>
+
+          <!-- Comment List -->
+          <div class="comments-list" id="comments-list">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+      `;
+
+      // 댓글 폼에 유저 표시
+      const userBox = document.getElementById('comment-user-box');
+      if (currentUser) {
+        userBox.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
+            <img src="${currentUser.avatar || 'assets/images/profile.jpg'}" style="width: 22px; height: 22px; border-radius: 50%;">
+            <strong>${currentUser.nickname || currentUser.name}</strong> 님으로 작성
+          </div>
+        `;
+      } else {
+        userBox.innerHTML = `
+          <input type="text" id="comment-guest-name" class="comment-guest-input" placeholder="닉네임 (방문자)" value="방문자" />
+        `;
+      }
+
+      // 댓글 목록 로드
+      renderComments(post.id);
+    }
+
+    // 좋아요 토글 핸들러
+    window.handleToggleLike = function(postId) {
+      const result = BlogCore.Post.toggleLike(postId);
+      const likeBtn = document.getElementById('like-btn');
+      const likeCount = document.getElementById('like-count');
+
+      likeCount.textContent = result.count;
+      if (result.liked) {
+        likeBtn.classList.add('liked');
+        likeBtn.querySelector('i').className = 'fa-solid fa-heart';
+        BlogCore.showToast('게시글을 좋아합니다 ❤️', 'success');
+      } else {
+        likeBtn.classList.remove('liked');
+        likeBtn.querySelector('i').className = 'fa-regular fa-heart';
+        BlogCore.showToast('좋아요를 취소했습니다.', 'info');
+      }
+    };
+
+    // 링크 복사 핸들러
+    window.handleCopyUrl = function() {
+      navigator.clipboard.writeText(window.location.href);
+      BlogCore.showToast('게시글 링크가 클립보드에 복사되었습니다!', 'success');
+    };
+
+    // 게시글 삭제 핸들러
+    window.handleDeleteDetailPost = function(postId) {
+      if (confirm('정말로 이 게시글을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.')) {
+        BlogCore.Post.delete(postId);
+        BlogCore.showToast('게시글이 성공적으로 삭제되었습니다.', 'info');
+        setTimeout(() => {
+          window.location.href = 'posts.html';
+        }, 800);
+      }
+    };
+
+    // 댓글 목록 렌더링
+    function renderComments(postId) {
+      const comments = BlogCore.Comment.getByPostId(postId);
+      const countEl = document.getElementById('comments-count');
+      const listEl = document.getElementById('comments-list');
+      const currentUser = BlogCore.Auth.getCurrentUser();
+
+      if (countEl) countEl.textContent = comments.length;
+
+      if (comments.length === 0) {
+        listEl.innerHTML = `
+          <div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 0.9rem;">
+            첫 번째 댓글의 주인공이 되어보세요!
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = comments.map(comment => {
+        const canDelete = currentUser && (currentUser.id === comment.userId || currentUser.role === 'admin');
+        return `
+          <div class="comment-item" id="comment-${comment.id}">
+            <img src="${comment.userAvatar || 'assets/images/강아지.jpg'}" alt="${comment.userName}" class="comment-avatar">
+            <div class="comment-body">
+              <div class="comment-top">
+                <span class="comment-author-name">${comment.userName}</span>
+                <span class="comment-date">${comment.createdAt}</span>
+              </div>
+              <p class="comment-text">${comment.content}</p>
+            </div>
+            ${canDelete ? `
+              <button onclick="handleDeleteComment(${postId}, ${comment.id})" class="comment-delete-btn" title="댓글 삭제">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 댓글 작성 핸들러
+    window.handleAddComment = function(postId) {
+      const input = document.getElementById('comment-text-input');
+      const content = input.value.trim();
+      if (!content) {
+        BlogCore.showToast('댓글 내용을 입력해 주세요.', 'error');
+        return;
+      }
+
+      let guestName = '방문자';
+      const guestInput = document.getElementById('comment-guest-name');
+      if (guestInput && guestInput.value.trim()) {
+        guestName = guestInput.value.trim();
+      }
+
+      BlogCore.Comment.add(postId, content, guestName);
+      input.value = '';
+      BlogCore.showToast('댓글이 등록되었습니다!', 'success');
+      renderComments(postId);
+    };
+
+    // 댓글 삭제 핸들러
+    window.handleDeleteComment = function(postId, commentId) {
+      if (confirm('댓글을 삭제하시겠습니까?')) {
+        BlogCore.Comment.delete(commentId);
+        BlogCore.showToast('댓글이 삭제되었습니다.', 'info');
+        renderComments(postId);
+      }
+    };
+  </script>
+</body>
+</html>

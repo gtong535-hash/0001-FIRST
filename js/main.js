@@ -52,10 +52,10 @@ function initTypingEffect() {
   if (!typingElement) return;
 
   const words = [
-    'Frontend Developer.',
-    'UI/UX Enthusiast.',
-    'Problem Solver.',
-    'Continuous Learner.'
+    'Frontend & Web Technologies.',
+    'Clean Architecture & Clean Code.',
+    'Web Performance & UI/UX.',
+    'Continuous Learning & Tech Insights.'
   ];
 
   let wordIndex = 0;

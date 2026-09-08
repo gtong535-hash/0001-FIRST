@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="웹 개발자 개인 포트폴리오 & 프로필 웹사이트">
-  <title>Developer Portfolio | 홈</title>
+  <meta name="description" content="DevLog - 기술과 성장을 기록하는 개인 개발 블로그">
+  <title>DevLog | 홈</title>
   
   <!-- Fonts & Icons -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -18,21 +18,25 @@
   <header id="header" class="navbar">
     <div class="container nav-container">
       <a href="index.html" class="nav-logo">
-        <span class="logo-accent">&lt;</span>Dev.Profile<span class="logo-accent">/&gt;</span>
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
       </a>
 
       <!-- Navigation Links -->
       <nav class="nav-menu" id="nav-menu">
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link active">홈</a></li>
+          <li><a href="posts.html" class="nav-link">게시글</a></li>
           <li><a href="about.html" class="nav-link">소개</a></li>
           <li><a href="skills.html" class="nav-link">기술</a></li>
           <li><a href="projects.html" class="nav-link">프로젝트</a></li>
         </ul>
       </nav>
 
-      <!-- Actions -->
+      <!-- Auth & Actions -->
       <div class="nav-actions">
+        <div id="nav-auth-container" class="nav-auth-container">
+          <!-- Dynamically populated by blog-core.js -->
+        </div>
         <button id="theme-toggle" class="btn-icon" aria-label="테마 전환" title="테마 변경">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -44,101 +48,124 @@
   </header>
 
   <main>
-    <!-- ==================== Hero Section ==================== -->
-    <section id="hero" class="section hero-section">
-      <div class="container hero-container">
-        <div class="hero-content reveal">
-          <div class="hero-badge">
-            <span class="pulse-dot"></span> Available for Work
-          </div>
-          <h1 class="hero-title">
-            안녕하세요, <br />
-            사용자 경험을 디자인하는 <br />
-            <span class="text-gradient">개발자 홍길동</span>입니다.
-          </h1>
-          <p class="hero-subtitle">
-            I am a <span id="typing-text" class="typing-text"></span><span class="cursor">|</span>
-          </p>
-          <p class="hero-desc">
-            직관적이고 매끄러운 웹 경험을 만드는 것을 좋아합니다. <br>
-            최신 웹 기술과 클린 코드로 가치 있는 서비스를 구축합니다.
-          </p>
-          
-          <div class="hero-cta">
-            <a href="about.html" class="btn btn-primary">
-              <i class="fa-solid fa-user"></i> 소개 보기
-            </a>
-            <a href="projects.html" class="btn btn-outline">
-              <i class="fa-solid fa-folder-open"></i> 프로젝트 보기
-            </a>
-          </div>
-
-          <div class="hero-socials">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-              <i class="fa-brands fa-github"></i>
-            </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-              <i class="fa-brands fa-linkedin"></i>
-            </a>
-            <a href="mailto:developer@example.com" aria-label="Email">
-              <i class="fa-solid fa-envelope"></i>
-            </a>
-          </div>
+    <!-- ==================== Blog Hero Section ==================== -->
+    <section class="blog-hero">
+      <div class="container">
+        <div class="blog-hero-badge">
+          <span class="pulse-dot"></span> Welcome to My Tech Archive
         </div>
-
-        <div class="hero-visual reveal">
-          <div class="profile-card">
-            <div class="profile-img-wrapper">
-              <img src="assets/images/profile.jpg" alt="프로필 이미지" class="profile-img">
-            </div>
-            <div class="profile-status-pill">
-              <span class="status-dot"></span> Frontend Developer
-            </div>
-          </div>
+        <h1 class="blog-hero-title">
+          생각과 코드를 기록하며 <br />
+          <span class="text-gradient">함께 성장하는 개발 공간</span>
+        </h1>
+        <p class="blog-hero-desc">
+          I write about <span id="typing-text" class="typing-text"></span><span class="cursor">|</span><br>
+          실무에서 마주한 기술적 고민, 아키텍처 설계, 그리고 문제 해결 과정을 기록합니다.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a href="posts.html" class="btn btn-primary">
+            <i class="fa-solid fa-book-open-reader"></i> 게시글 둘러보기
+          </a>
+          <a href="write.html" class="btn btn-outline">
+            <i class="fa-solid fa-pen-nib"></i> 새 글 작성하기
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- ==================== Quick Navigation Preview Cards ==================== -->
-    <section class="section preview-section">
+    <!-- ==================== Main Blog Layout (Content + Sidebar) ==================== -->
+    <section class="section" style="padding-top: 36px;">
       <div class="container">
-        <div class="section-header reveal">
-          <span class="section-subtitle">Overview</span>
-          <h2 class="section-title">포트폴리오 둘러보기</h2>
-          <div class="title-bar"></div>
+
+        <!-- Featured Post Spotlight -->
+        <div id="featured-post-container">
+          <!-- Populated by JavaScript -->
         </div>
 
-        <div class="preview-grid">
-          <!-- Card 1: About -->
-          <div class="preview-card reveal">
-            <div class="preview-icon"><i class="fa-solid fa-address-card"></i></div>
-            <h3 class="preview-title">소개 (About Me)</h3>
-            <p class="preview-desc">개발 철학과 인적 사항, 그리고 지금까지 걸어온 경력 및 교육 이력을 확인하실 수 있습니다.</p>
-            <a href="about.html" class="btn btn-outline btn-full">
-              자세히 보기 <i class="fa-solid fa-arrow-right"></i>
-            </a>
+        <div class="blog-layout">
+          <!-- Left: Recent Articles List -->
+          <div class="blog-main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <div>
+                <span class="section-subtitle">Latest Articles</span>
+                <h2 style="font-size: 1.5rem; font-weight: 800;">최신 게시글</h2>
+              </div>
+              <a href="posts.html" class="btn btn-outline btn-sm" style="font-size: 0.85rem;">
+                전체보기 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <!-- Posts Grid -->
+            <div class="posts-grid" id="home-posts-grid">
+              <!-- Populated by JavaScript -->
+            </div>
+
+            <div style="text-align: center; margin-top: 36px;">
+              <a href="posts.html" class="btn btn-outline" style="padding: 12px 32px;">
+                <i class="fa-solid fa-layer-group"></i> 모든 게시글 보러가기
+              </a>
+            </div>
           </div>
 
-          <!-- Card 2: Skills -->
-          <div class="preview-card reveal">
-            <div class="preview-icon"><i class="fa-solid fa-layer-group"></i></div>
-            <h3 class="preview-title">기술 (Skills)</h3>
-            <p class="preview-desc">프론트엔드, 백엔드 및 DevOps 도구 등 보유하고 있는 전문 기술 스택을 정리했습니다.</p>
-            <a href="skills.html" class="btn btn-outline btn-full">
-              자세히 보기 <i class="fa-solid fa-arrow-right"></i>
-            </a>
-          </div>
+          <!-- Right: Sidebar Widgets -->
+          <aside class="blog-sidebar">
+            <!-- Author Profile Widget -->
+            <div class="sidebar-widget sidebar-profile">
+              <img src="assets/images/profile.jpg" alt="블로그 운영자" class="sidebar-avatar">
+              <h3 class="sidebar-name">홍길동 (Gildong)</h3>
+              <p class="sidebar-role">Frontend & Fullstack Developer</p>
+              <p class="sidebar-bio">
+                웹 기술과 사용자 경험에 진심인 개발자입니다. 복잡한 문제를 단순하고 읽기 쉬운 코드로 풀어내는 것을 즐깁니다.
+              </p>
+              <div class="sidebar-socials">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="sidebar-social-link" title="GitHub">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="sidebar-social-link" title="LinkedIn">
+                  <i class="fa-brands fa-linkedin"></i>
+                </a>
+                <a href="mailto:developer@example.com" class="sidebar-social-link" title="Email">
+                  <i class="fa-solid fa-envelope"></i>
+                </a>
+              </div>
+              <div style="margin-top: 16px;">
+                <a href="about.html" class="btn btn-outline btn-sm btn-full">
+                  <i class="fa-solid fa-user"></i> 프로필 & 소개 더보기
+                </a>
+              </div>
+            </div>
 
-          <!-- Card 3: Projects -->
-          <div class="preview-card reveal">
-            <div class="preview-icon"><i class="fa-solid fa-laptop-code"></i></div>
-            <h3 class="preview-title">프로젝트 (Projects)</h3>
-            <p class="preview-desc">실제 기획부터 구현까지 진행한 주요 웹 애플리케이션 및 상세 기능 명세를 소개합니다.</p>
-            <a href="projects.html" class="btn btn-outline btn-full">
-              자세히 보기 <i class="fa-solid fa-arrow-right"></i>
-            </a>
-          </div>
+            <!-- Popular / Trending Posts Widget -->
+            <div class="sidebar-widget">
+              <h3 class="widget-title">
+                <i class="fa-solid fa-fire"></i> 인기 글 (Most Viewed)
+              </h3>
+              <div class="sidebar-recent-list" id="popular-posts-list">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Tag Cloud Widget -->
+            <div class="sidebar-widget">
+              <h3 class="widget-title">
+                <i class="fa-solid fa-tags"></i> 인기 태그 (Tags)
+              </h3>
+              <div class="tag-cloud" id="home-tag-cloud">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Blog Quick Link Banner -->
+            <div class="skills-cta-box" style="margin-top: 0;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 8px;">🚀 프로젝트 포트폴리오</h3>
+              <p style="font-size: 0.85rem; margin-bottom: 14px;">블로그에 기록된 기술들로 만든 실제 프로젝트들을 확인해보세요.</p>
+              <a href="projects.html" class="btn btn-primary btn-sm">
+                프로젝트 보러가기 <i class="fa-solid fa-arrow-right"></i>
+              </a>
+            </div>
+          </aside>
         </div>
+
       </div>
     </section>
   </main>
@@ -147,21 +174,127 @@
   <footer class="footer">
     <div class="container footer-container">
       <div class="footer-logo">
-        <span class="logo-accent">&lt;</span>Dev.Profile<span class="logo-accent">/&gt;</span>
+        <span class="logo-accent">&lt;</span>Dev.Log<span class="logo-accent">/&gt;</span>
       </div>
-      <p class="footer-copy">&copy; 2026 홍길동 (Hong Gil-Dong). All rights reserved.</p>
-      <div class="footer-links">
-        <a href="#hero" class="back-to-top" title="맨 위로 이동">
-          <i class="fa-solid fa-arrow-up"></i>
-        </a>
-      </div>
+      <p class="footer-copy">&copy; 2024 DevLog. All rights reserved. Designed for developers.</p>
     </div>
   </footer>
 
-  <!-- Toast Container -->
-  <div id="toast" class="toast" role="alert"></div>
+  <div id="toast" class="toast"></div>
 
   <!-- Scripts -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-core.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const posts = BlogCore.Post.getAll();
+
+      // 1. 피처드 포스트 렌더링
+      const featuredPost = posts.find(p => p.featured) || posts[0];
+      const featuredContainer = document.getElementById('featured-post-container');
+
+      if (featuredPost && featuredContainer) {
+        featuredContainer.innerHTML = `
+          <div class="featured-post-card">
+            <a href="post-detail.html?id=${featuredPost.id}" class="featured-post-img-wrap">
+              <img src="${featuredPost.coverImage}" alt="${featuredPost.title}" class="featured-post-img">
+              <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured</span>
+            </a>
+            <div class="featured-post-body">
+              <span class="post-category-tag">${featuredPost.categoryName}</span>
+              <h2 class="featured-post-title">
+                <a href="post-detail.html?id=${featuredPost.id}">${featuredPost.title}</a>
+              </h2>
+              <p class="featured-post-desc">${featuredPost.summary}</p>
+              <div class="post-card-tags" style="margin-bottom: 20px;">
+                ${(featuredPost.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag">#${t}</a>`).join('')}
+              </div>
+              <div class="post-card-footer" style="padding-top: 14px;">
+                <div class="post-author-mini">
+                  <img src="${featuredPost.authorAvatar || 'assets/images/profile.jpg'}" alt="${featuredPost.authorName}" class="author-mini-avatar">
+                  <span>${featuredPost.authorName}</span>
+                  <span style="color: var(--text-muted);">• ${featuredPost.createdAt.split(' ')[0]}</span>
+                </div>
+                <a href="post-detail.html?id=${featuredPost.id}" class="btn btn-primary btn-sm">
+                  읽기 <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. 홈 최신 게시글 4개 렌더링
+      const homePostsGrid = document.getElementById('home-posts-grid');
+      if (homePostsGrid) {
+        const recentPosts = posts.slice(0, 4);
+        homePostsGrid.innerHTML = recentPosts.map(post => `
+          <article class="post-card">
+            <a href="post-detail.html?id=${post.id}" class="post-card-thumb-wrap">
+              <img src="${post.coverImage}" alt="${post.title}" class="post-card-thumb" loading="lazy">
+              <span class="post-card-category">${post.categoryName}</span>
+            </a>
+            <div class="post-card-body">
+              <h3 class="post-card-title">
+                <a href="post-detail.html?id=${post.id}">${post.title}</a>
+              </h3>
+              <p class="post-card-desc">${post.summary}</p>
+              <div class="post-card-tags">
+                ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag">#${t}</a>`).join('')}
+              </div>
+              <div class="post-card-footer">
+                <div class="post-author-mini">
+                  <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-mini-avatar">
+                  <span>${post.authorName}</span>
+                </div>
+                <div class="post-card-stats">
+                  <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span>
+                  <span><i class="fa-regular fa-heart"></i> ${post.likes || 0}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        `).join('');
+      }
+
+      // 3. 인기 글 랭킹 (조회수 기준 상위 3개)
+      const popularList = document.getElementById('popular-posts-list');
+      if (popularList) {
+        const popularPosts = [...posts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+        popularList.innerHTML = popularPosts.map(post => `
+          <div class="sidebar-recent-item">
+            <img src="${post.coverImage}" alt="${post.title}" class="sidebar-recent-thumb">
+            <div class="sidebar-recent-info">
+              <h4 class="sidebar-recent-title">
+                <a href="post-detail.html?id=${post.id}">${post.title}</a>
+              </h4>
+              <div class="sidebar-recent-date">
+                <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span> • 
+                <span>${post.createdAt.split(' ')[0]}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 4. 태그 클라우드 추출 및 렌더링
+      const tagCloud = document.getElementById('home-tag-cloud');
+      if (tagCloud) {
+        const tagMap = {};
+        posts.forEach(p => {
+          (p.tags || []).forEach(t => {
+            tagMap[t] = (tagMap[t] || 0) + 1;
+          });
+        });
+        const sortedTags = Object.keys(tagMap).sort((a, b) => tagMap[b] - tagMap[a]);
+        tagCloud.innerHTML = sortedTags.map(tag => `
+          <a href="posts.html?tag=${encodeURIComponent(tag)}" class="tag-cloud-item">
+            #${tag} (${tagMap[tag]})
+          </a>
+        `).join('');
+      }
+    });
+  </script>
 </body>
 </html>
