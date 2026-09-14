@@ -13,8 +13,8 @@
     GAS_URL: 'devlog_gas_url'
   };
 
-  // Google Apps Script Web App 배포 URL (검증 완료된 최신 URL)
-  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw9VDxd_eudjlem7EvGjHPBTdSKGLLhnXCrfrsEtLh8pFN1Nm3KskPAWQP3k-y5-8GIog/exec';
+  // Google Apps Script Web App 배포 URL (사용자 제공 최신 배포 ID 적용)
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbw-QNWjC9mri6g0FO3x65ODw2feuLSj7itThN0T7nGYAFXh5PIHDC0igtGv7cVIuejpl/exec';
   let GAS_API_URL = DEFAULT_GAS_URL;
   localStorage.setItem(STORAGE_KEYS.GAS_URL, DEFAULT_GAS_URL);
 
