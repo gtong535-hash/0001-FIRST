@@ -206,15 +206,22 @@
 
         // 5. 렌더링
         if (currentPosts.length === 0) {
+          const isTotalEmpty = (BlogCore.Post.getAll().length === 0);
           postsGrid.innerHTML = `
-            <div class="empty-state" style="grid-column: 1 / -1;">
-              <i class="fa-solid fa-folder-open empty-state-icon"></i>
-              <h3 class="empty-state-title">검색된 게시글이 없습니다</h3>
-              <p>다른 검색어를 입력하시거나 새로운 기술 글을 작성해 보세요.</p>
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 60px 24px; text-align: center;">
+              <i class="fa-solid fa-folder-open empty-state-icon" style="font-size: 2.8rem; color: var(--text-muted); margin-bottom: 14px;"></i>
+              <h3 class="empty-state-title" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">
+                ${isTotalEmpty ? '아직 등록된 게시글이 없습니다' : '검색된 게시글이 없습니다'}
+              </h3>
+              <p style="color: var(--text-muted); margin-bottom: 18px;">
+                ${isTotalEmpty ? '첫 번째 기술 블로그 글을 작성하고 지식을 공유해 보세요!' : '다른 검색어를 입력하시거나 필터를 초기화해 보세요.'}
+              </p>
               <div style="display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-                <button class="btn btn-outline" onclick="resetFilters()">
-                  <i class="fa-solid fa-rotate-left"></i> 필터 초기화
-                </button>
+                ${!isTotalEmpty ? `
+                  <button class="btn btn-outline" onclick="resetFilters()">
+                    <i class="fa-solid fa-rotate-left"></i> 필터 초기화
+                  </button>
+                ` : ''}
                 <a href="write.html" class="btn btn-primary">
                   <i class="fa-solid fa-pen-nib"></i> 새 글 작성하기
                 </a>

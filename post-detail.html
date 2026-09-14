@@ -137,6 +137,11 @@
       // 본문 HTML 파싱
       const parsedContent = BlogCore.parseSimpleMarkdown(post.content);
 
+      // 작성자 소개 정보
+      const allUsers = BlogCore.Auth.getUsers();
+      const authorUser = allUsers.find(u => u.id === post.authorId || u.nickname === post.authorName);
+      const authorBio = (authorUser && authorUser.bio) || post.authorBio || '기술의 깊이를 더하고 공유의 즐거움을 나누는 개발자입니다.';
+
       container.innerHTML = `
         <!-- Post Header -->
         <header class="post-detail-header">
@@ -209,9 +214,7 @@
           <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-card-avatar">
           <div>
             <h4 class="author-card-name">${post.authorName}</h4>
-            <p class="author-card-bio">
-              기술의 깊이를 더하고 공유의 즐거움을 나누는 개발자입니다. 새로운 문제 해결과 클린 코드에 열정을 쏟고 있습니다.
-            </p>
+            <p class="author-card-bio">${authorBio}</p>
           </div>
         </div>
 

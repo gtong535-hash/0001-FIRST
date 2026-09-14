@@ -16,8 +16,8 @@ const projectsData = [
       "장바구니 상태 관리 및 모의 결제 API 연동",
       "관리자 대시보드를 통한 매출 및 재고 관리 통계"
     ],
-    demoUrl: "https://example.com/demo1",
-    githubUrl: "https://github.com/example/ecommerce-app"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   },
   {
     id: 2,
@@ -32,8 +32,8 @@ const projectsData = [
       "우선순위(긴급/보통/낮음) 태그 지정 및 마감일 알림",
       "다크 모드 및 라이트 모드 테마 실시간 전환 지원"
     ],
-    demoUrl: "https://example.com/demo2",
-    githubUrl: "https://github.com/example/kanban-board"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   },
   {
     id: 3,
@@ -48,8 +48,8 @@ const projectsData = [
       "도시 검색 자동완성 및 최근 검색 기록 저장",
       "날씨 상태에 따른 동적 배경 애니메이션 효과"
     ],
-    demoUrl: "https://example.com/demo3",
-    githubUrl: "https://github.com/example/weather-app"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   },
   {
     id: 4,
@@ -64,8 +64,8 @@ const projectsData = [
       "작성한 문서를 마크다운(.md), HTML, PDF로 즉시 다운로드",
       "단축키 지원 (굵게, 기울임, 링크, 표 삽입 등)"
     ],
-    demoUrl: "https://example.com/demo4",
-    githubUrl: "https://github.com/example/markdown-editor"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   },
   {
     id: 5,
@@ -80,8 +80,8 @@ const projectsData = [
       "CSV 및 Excel 데이터 가져오기 / 내보내기",
       "반응형 대시보드 차트 시각화"
     ],
-    demoUrl: "https://example.com/demo5",
-    githubUrl: "https://github.com/example/finance-tracker"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   },
   {
     id: 6,
@@ -96,7 +96,7 @@ const projectsData = [
       "퀴즈 완료 후 오답 복습 및 상세 해설 제공",
       "최종 스코어 로컬 랭킹 시스템"
     ],
-    demoUrl: "https://example.com/demo6",
-    githubUrl: "https://github.com/example/quiz-app"
+    demoUrl: "#",
+    githubUrl: "https://github.com/gtong535-hash"
   }
 ];

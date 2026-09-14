@@ -55,16 +55,12 @@
           <!-- Profile Top Info Rendered via JS -->
           <img src="assets/images/profile.jpg" alt="프로필 아바타" class="profile-avatar-large" id="prof-avatar">
           <div class="profile-main-info">
-            <h1 class="profile-user-nickname" id="prof-nickname">홍길동</h1>
-            <p class="profile-user-email" id="prof-email">hong@example.com</p>
+            <h1 class="profile-user-nickname" id="prof-nickname">-</h1>
+            <p class="profile-user-email" id="prof-email">-</p>
             <p class="profile-user-bio" id="prof-bio">
-              기록하고 공유하며 성장하는 프론트엔드 개발자입니다. 모던 웹 기술과 클린 아키텍처에 관심이 많습니다.
+              프로필 정보를 불러오는 중입니다...
             </p>
-            <div class="profile-user-tags" id="prof-tags">
-              <span class="post-card-tag">React</span>
-              <span class="post-card-tag">TypeScript</span>
-              <span class="post-card-tag">Next.js</span>
-            </div>
+            <div class="profile-user-tags" id="prof-tags"></div>
           </div>
           <div class="profile-top-actions">
             <a href="write.html" class="btn btn-primary">
@@ -94,7 +90,7 @@
             <div class="stat-label">작성한 댓글</div>
           </div>
           <div class="stat-metric-card">
-            <div class="stat-number" id="stat-days-count">30</div>
+            <div class="stat-number" id="stat-days-count">0</div>
             <div class="stat-label">활동 일수</div>
           </div>
         </div>
@@ -188,10 +184,10 @@
         currentUser = {
           id: 'guest',
           nickname: '게스트 사용자',
-          email: '로그인이 필요합니다 (guest@example.com)',
+          email: '로그인이 필요합니다',
           bio: '로그인하시면 나만의 프로필 관리, 새 글 작성, 좋아요 및 활동 내역을 편리하게 확인하실 수 있습니다.',
           avatar: 'assets/images/profile.jpg',
-          interests: ['DevLog', '게스트']
+          interests: ['DevLog']
         };
 
         const topActions = document.querySelector('.profile-top-actions');
@@ -294,6 +290,11 @@
       document.getElementById('stat-posts-count').textContent = myPosts.length;
       document.getElementById('stat-likes-count').textContent = likedPosts.length;
       document.getElementById('stat-comments-count').textContent = myComments.length;
+
+      const daysCount = (user && user.id !== 'guest' && user.joinedAt)
+        ? Math.max(1, Math.ceil((new Date() - new Date(user.joinedAt)) / (1000 * 60 * 60 * 24)))
+        : (user.id === 'guest' ? 0 : 1);
+      document.getElementById('stat-days-count').textContent = daysCount;
 
       document.getElementById('tab-posts-badge').textContent = myPosts.length;
       document.getElementById('tab-likes-badge').textContent = likedPosts.length;

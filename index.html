@@ -111,21 +111,18 @@
           <aside class="blog-sidebar">
             <!-- Author Profile Widget -->
             <div class="sidebar-widget sidebar-profile">
-              <img src="assets/images/profile.jpg" alt="블로그 운영자" class="sidebar-avatar">
-              <h3 class="sidebar-name">홍길동 (Gildong)</h3>
-              <p class="sidebar-role">Frontend & Fullstack Developer</p>
-              <p class="sidebar-bio">
-                웹 기술과 사용자 경험에 진심인 개발자입니다. 복잡한 문제를 단순하고 읽기 쉬운 코드로 풀어내는 것을 즐깁니다.
+              <img src="assets/images/profile.jpg" alt="블로그 운영자" class="sidebar-avatar" id="sidebar-author-avatar">
+              <h3 class="sidebar-name" id="sidebar-author-name">DevLog 블로그</h3>
+              <p class="sidebar-role" id="sidebar-author-role">Tech Archive & Engineering Log</p>
+              <p class="sidebar-bio" id="sidebar-author-bio">
+                기술적 고민과 문제 해결 과정, 지속적인 배움을 기록하고 공유하는 개발 공간입니다.
               </p>
               <div class="sidebar-socials">
                 <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="sidebar-social-link" title="GitHub">
                   <i class="fa-brands fa-github"></i>
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="sidebar-social-link" title="LinkedIn">
-                  <i class="fa-brands fa-linkedin"></i>
-                </a>
-                <a href="mailto:developer@example.com" class="sidebar-social-link" title="Email">
-                  <i class="fa-solid fa-envelope"></i>
+                <a href="about.html" class="sidebar-social-link" title="소개">
+                  <i class="fa-solid fa-user"></i>
                 </a>
               </div>
               <div style="margin-top: 16px;">
@@ -201,35 +198,39 @@
       const featuredPost = sortedPosts.find(p => p.featured) || sortedPosts[0];
       const featuredContainer = document.getElementById('featured-post-container');
 
-      if (featuredPost && featuredContainer) {
-        featuredContainer.innerHTML = `
-          <div class="featured-post-card" onclick="window.location.href='post-detail.html?id=${featuredPost.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${featuredPost.title}">
-            <a href="post-detail.html?id=${featuredPost.id}" class="featured-post-img-wrap" onclick="event.stopPropagation()">
-              <img src="${featuredPost.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'}" alt="${featuredPost.title}" class="featured-post-img" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'">
-              <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured</span>
-            </a>
-            <div class="featured-post-body">
-              <span class="post-category-tag">${featuredPost.categoryName || '개발 이야기'}</span>
-              <h2 class="featured-post-title">
-                <a href="post-detail.html?id=${featuredPost.id}" onclick="event.stopPropagation()">${featuredPost.title}</a>
-              </h2>
-              <p class="featured-post-desc">${featuredPost.summary || ''}</p>
-              <div class="post-card-tags" style="margin-bottom: 20px;">
-                ${(featuredPost.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" onclick="event.stopPropagation()">#${t}</a>`).join('')}
-              </div>
-              <div class="post-card-footer" style="padding-top: 14px;">
-                <div class="post-author-mini">
-                  <img src="${featuredPost.authorAvatar || 'assets/images/profile.jpg'}" alt="${featuredPost.authorName}" class="author-mini-avatar" onerror="this.src='assets/images/profile.jpg'">
-                  <span>${featuredPost.authorName}</span>
-                  <span style="color: var(--text-muted);">• ${(featuredPost.createdAt || '').split(' ')[0]}</span>
+      if (featuredContainer) {
+        if (featuredPost) {
+          featuredContainer.innerHTML = `
+            <div class="featured-post-card" onclick="window.location.href='post-detail.html?id=${featuredPost.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${featuredPost.title}">
+              <a href="post-detail.html?id=${featuredPost.id}" class="featured-post-img-wrap" onclick="event.stopPropagation()">
+                <img src="${featuredPost.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'}" alt="${featuredPost.title}" class="featured-post-img" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'">
+                <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured</span>
+              </a>
+              <div class="featured-post-body">
+                <span class="post-category-tag">${featuredPost.categoryName || '개발 이야기'}</span>
+                <h2 class="featured-post-title">
+                  <a href="post-detail.html?id=${featuredPost.id}" onclick="event.stopPropagation()">${featuredPost.title}</a>
+                </h2>
+                <p class="featured-post-desc">${featuredPost.summary || ''}</p>
+                <div class="post-card-tags" style="margin-bottom: 20px;">
+                  ${(featuredPost.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" onclick="event.stopPropagation()">#${t}</a>`).join('')}
                 </div>
-                <a href="post-detail.html?id=${featuredPost.id}" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">
-                  읽기 <i class="fa-solid fa-arrow-right"></i>
-                </a>
+                <div class="post-card-footer" style="padding-top: 14px;">
+                  <div class="post-author-mini">
+                    <img src="${featuredPost.authorAvatar || 'assets/images/profile.jpg'}" alt="${featuredPost.authorName}" class="author-mini-avatar" onerror="this.src='assets/images/profile.jpg'">
+                    <span>${featuredPost.authorName}</span>
+                    <span style="color: var(--text-muted);">• ${(featuredPost.createdAt || '').split(' ')[0]}</span>
+                  </div>
+                  <a href="post-detail.html?id=${featuredPost.id}" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">
+                    읽기 <i class="fa-solid fa-arrow-right"></i>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          featuredContainer.innerHTML = '';
+        }
       }
 
       // 2. 홈 최신 게시글 6개 렌더링
@@ -287,20 +288,24 @@
       const popularList = document.getElementById('popular-posts-list');
       if (popularList) {
         const popularPosts = [...sortedPosts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
-        popularList.innerHTML = popularPosts.map(post => `
-          <div class="sidebar-recent-item" onclick="window.location.href='post-detail.html?id=${post.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${post.title}">
-            <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'}" alt="${post.title}" class="sidebar-recent-thumb" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'">
-            <div class="sidebar-recent-info">
-              <h4 class="sidebar-recent-title">
-                <a href="post-detail.html?id=${post.id}" onclick="event.stopPropagation()">${post.title}</a>
-              </h4>
-              <div class="sidebar-recent-date">
-                <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span> • 
-                <span>${(post.createdAt || '').split(' ')[0]}</span>
+        if (popularPosts.length === 0) {
+          popularList.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-muted); padding: 12px 0; text-align: center;">등록된 인기 글이 없습니다.</p>';
+        } else {
+          popularList.innerHTML = popularPosts.map(post => `
+            <div class="sidebar-recent-item" onclick="window.location.href='post-detail.html?id=${post.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${post.title}">
+              <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'}" alt="${post.title}" class="sidebar-recent-thumb" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'">
+              <div class="sidebar-recent-info">
+                <h4 class="sidebar-recent-title">
+                  <a href="post-detail.html?id=${post.id}" onclick="event.stopPropagation()">${post.title}</a>
+                </h4>
+                <div class="sidebar-recent-date">
+                  <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span> • 
+                  <span>${(post.createdAt || '').split(' ')[0]}</span>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `).join('');
+        }
       }
 
       // 4. 태그 클라우드 추출 및 렌더링
@@ -313,11 +318,26 @@
           });
         });
         const sortedTags = Object.keys(tagMap).sort((a, b) => tagMap[b] - tagMap[a]);
-        tagCloud.innerHTML = sortedTags.map(tag => `
-          <a href="posts.html?tag=${encodeURIComponent(tag)}" class="tag-cloud-item">
-            #${tag} (${tagMap[tag]})
-          </a>
-        `).join('');
+        if (sortedTags.length === 0) {
+          tagCloud.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-muted); padding: 8px 0; text-align: center;">등록된 태그가 없습니다.</p>';
+        } else {
+          tagCloud.innerHTML = sortedTags.map(tag => `
+            <a href="posts.html?tag=${encodeURIComponent(tag)}" class="tag-cloud-item">
+              #${tag} (${tagMap[tag]})
+            </a>
+          `).join('');
+        }
+      }
+
+      // 5. 사이드바 프로필 로그인 사용자 동적 연동
+      const currentUser = BlogCore.Auth.getCurrentUser();
+      if (currentUser && currentUser.id !== 'guest') {
+        const sName = document.getElementById('sidebar-author-name');
+        const sBio = document.getElementById('sidebar-author-bio');
+        const sAvatar = document.getElementById('sidebar-author-avatar');
+        if (sName) sName.textContent = currentUser.nickname || currentUser.name;
+        if (sBio && currentUser.bio) sBio.textContent = currentUser.bio;
+        if (sAvatar && currentUser.avatar) sAvatar.src = currentUser.avatar;
       }
     });
   </script>

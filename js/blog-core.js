@@ -18,33 +18,40 @@
   let GAS_API_URL = DEFAULT_GAS_URL;
   localStorage.setItem(STORAGE_KEYS.GAS_URL, DEFAULT_GAS_URL);
 
-  // 1. 스토리지 초기화
+  // 1. 스토리지 초기화 및 더미데이터 자동 정제
   function initStorage() {
-    if (!localStorage.getItem(STORAGE_KEYS.POSTS)) {
-      if (typeof initialBlogData !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(initialBlogData.posts));
-      } else {
-        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]));
+    // 1-1. 기존 브라우저에 캐시된 데모/더미 데이터(user_admin, hong@example.com, 더미 게시글 1~4번) 자동 제거
+    try {
+      const existingPosts = JSON.parse(localStorage.getItem(STORAGE_KEYS.POSTS) || '[]');
+      const realPosts = existingPosts.filter(p => p.id !== 1 && p.id !== 2 && p.id !== 3 && p.id !== 4 && p.authorId !== 'user_admin');
+      if (realPosts.length !== existingPosts.length || !localStorage.getItem(STORAGE_KEYS.POSTS)) {
+        localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(realPosts));
       }
-    }
 
-    if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-      if (typeof initialBlogData !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(initialBlogData.users));
-      } else {
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
+      const existingUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+      const realUsers = existingUsers.filter(u => u.id !== 'user_admin' && u.id !== 'user_demo' && u.email !== 'hong@example.com' && u.email !== 'guest@example.com');
+      if (realUsers.length !== existingUsers.length || !localStorage.getItem(STORAGE_KEYS.USERS)) {
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(realUsers));
       }
-    }
 
-    if (!localStorage.getItem(STORAGE_KEYS.COMMENTS)) {
-      if (typeof initialBlogData !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(initialBlogData.comments));
-      } else {
-        localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify([]));
+      const existingComments = JSON.parse(localStorage.getItem(STORAGE_KEYS.COMMENTS) || '[]');
+      const realComments = existingComments.filter(c => c.userId !== 'user_admin' && c.userId !== 'user_demo' && c.postId !== 1 && c.postId !== 2 && c.postId !== 3 && c.postId !== 4);
+      if (realComments.length !== existingComments.length || !localStorage.getItem(STORAGE_KEYS.COMMENTS)) {
+        localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify(realComments));
       }
-    }
 
-    if (!localStorage.getItem(STORAGE_KEYS.LIKES)) {
+      const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || 'null');
+      if (currentUser && (currentUser.id === 'user_admin' || currentUser.id === 'user_demo' || currentUser.email === 'hong@example.com' || currentUser.email === 'guest@example.com')) {
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+      }
+
+      if (!localStorage.getItem(STORAGE_KEYS.LIKES)) {
+        localStorage.setItem(STORAGE_KEYS.LIKES, JSON.stringify([]));
+      }
+    } catch (e) {
+      localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
+      localStorage.setItem(STORAGE_KEYS.COMMENTS, JSON.stringify([]));
       localStorage.setItem(STORAGE_KEYS.LIKES, JSON.stringify([]));
     }
   }

@@ -57,20 +57,6 @@
         <p class="auth-subtitle">DevLog에 오신 것을 환영합니다. 계정에 로그인하세요.</p>
       </div>
 
-      <!-- Quick Demo Login Helper Box -->
-      <div class="demo-account-box">
-        <div class="demo-account-title"><i class="fa-solid fa-wand-magic-sparkles"></i> 빠른 체험용 데모 계정</div>
-        <p class="demo-account-desc">클릭 한 번으로 데모 계정 정보를 자동 입력할 수 있습니다.</p>
-        <div style="display: flex; gap: 8px; justify-content: center;">
-          <button type="button" id="btn-fill-admin" class="btn btn-sm btn-outline">
-            운영자 (홍길동)
-          </button>
-          <button type="button" id="btn-fill-guest" class="btn btn-sm btn-outline">
-            게스트 (김방문)
-          </button>
-        </div>
-      </div>
-
       <form id="login-form" class="auth-form" novalidate>
         <div class="form-group">
           <label for="login-email" class="form-label">이메일 주소</label>
@@ -78,7 +64,7 @@
             type="email" 
             id="login-email" 
             class="form-input" 
-            placeholder="example@domain.com" 
+            placeholder="이메일을 입력하세요" 
             required 
             autocomplete="email"
           />
@@ -88,7 +74,7 @@
         <div class="form-group">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <label for="login-password" class="form-label" style="margin-bottom: 0;">비밀번호</label>
-            <a href="#" onclick="alert('데모 환경입니다. 기본 비밀번호는 password123 입니다.'); return false;" style="font-size: 0.78rem; color: var(--primary);">비밀번호 찾기</a>
+            <a href="#" onclick="BlogCore.showToast('비밀번호를 분실하신 경우 관리자에게 문의해 주세요.', 'info'); return false;" style="font-size: 0.78rem; color: var(--primary);">비밀번호 찾기</a>
           </div>
           <input 
             type="password" 
@@ -149,19 +135,6 @@
       const passwordInput = document.getElementById('login-password');
       const emailError = document.getElementById('login-email-error');
       const passwordError = document.getElementById('login-password-error');
-
-      // 데모 계정 자동완성 버튼
-      document.getElementById('btn-fill-admin').addEventListener('click', () => {
-        emailInput.value = 'hong@example.com';
-        passwordInput.value = 'password123';
-        clearErrors();
-      });
-
-      document.getElementById('btn-fill-guest').addEventListener('click', () => {
-        emailInput.value = 'guest@example.com';
-        passwordInput.value = 'password123';
-        clearErrors();
-      });
 
       function clearErrors() {
         emailInput.classList.remove('error');
