@@ -2558,6 +2558,87 @@ button, input, textarea {
   padding-bottom: 16px;
 }
 
+.autosave-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-alt);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+}
+
+.autosave-status-pill.saving {
+  color: var(--primary);
+  border-color: rgba(37, 99, 235, 0.3);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.autosave-status-pill.saved {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.draft-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(59, 130, 246, 0.04));
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.draft-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.draft-alert-content .draft-icon {
+  font-size: 1.25rem;
+  color: var(--primary);
+}
+
+.draft-text-box strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.draft-saved-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.draft-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .editor-title-input {
   width: 100%;
   font-size: 1.8rem;

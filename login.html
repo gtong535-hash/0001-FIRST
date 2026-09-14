@@ -178,7 +178,7 @@
             setTimeout(() => {
               const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || 'profile.html';
               window.location.href = redirectUrl;
-            }, 600);
+            }, 250);
           } else {
             passwordInput.classList.add('error');
             passwordError.textContent = result.message;

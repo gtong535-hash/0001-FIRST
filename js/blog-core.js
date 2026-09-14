@@ -10,7 +10,9 @@
     CURRENT_USER: 'devlog_current_user',
     COMMENTS: 'devlog_comments',
     LIKES: 'devlog_likes',
-    GAS_URL: 'devlog_gas_url'
+    GAS_URL: 'devlog_gas_url',
+    LAST_SYNC: 'devlog_last_sync',
+    DRAFT: 'devlog_draft'
   };
 
   // Google Apps Script Web App 배포 URL (사용자 제공 최신 배포 ID 적용)
@@ -81,73 +83,55 @@
     async login(email, password) {
       email = email.trim().toLowerCase();
 
-      // 1. 구글 스프레드시트 API 연동 시도
+      // 1. [Local-First 아키텍처] 로컬 스토리지 우선 검증 (0ms 초고속 즉시 로그인)
+      const users = this.getUsers();
+      const localUser = users.find(u => u.email.toLowerCase() === email && u.password === password);
+      if (localUser) {
+        const sessionUser = { ...localUser };
+        delete sessionUser.password;
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionUser));
+
+        // UI를 기다리게 하지 않는 비동기 백그라운드 구글 시트 동기화
+        if (GAS_API_URL) {
+          BlogSync.sendToSheet('login', { email, password }).catch(() => {});
+        }
+        return { success: true, user: sessionUser };
+      }
+
+      // 2. 로컬에 없는 계정인 경우에만 구글 스프레드시트 원격 조회 (타 기기/브라우저 가입 대응)
       if (GAS_API_URL) {
         try {
           const res = await BlogSync.sendToSheet('login', { email, password });
           if (res && res.success && res.user) {
+            // 원격에서 가져온 사용자 로컬에 저장하여 다음번 로그인 시 0ms 처리
+            if (!users.some(u => u.email.toLowerCase() === email)) {
+              users.push({ ...res.user, password });
+              localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+            }
             localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(res.user));
             return { success: true, user: res.user };
           } else if (res && res.message && !res.offline) {
-            if (res.message.includes('시트') || res.message.includes('setupUsersSheet')) {
-              console.warn('⚠️ 구글 시트 설정 미완료 감지 -> 로컬 저장소 DB로 로그인 시도합니다.');
-            } else {
-              return { success: false, message: res.message };
-            }
+            return { success: false, message: res.message };
           }
         } catch (err) {
-          console.warn('스프레드시트 로그인 연동 실패, 로컬 DB로 전환:', err);
+          console.warn('스프레드시트 원격 로그인 조회 실패:', err);
         }
       }
 
-      // 2. 로컬 스토리지 Fallback
-      const users = this.getUsers();
-      const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
-      if (user) {
-        const sessionUser = { ...user };
-        delete sessionUser.password;
-        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionUser));
-        return { success: true, user: sessionUser };
-      }
       return { success: false, message: '이메일 또는 비밀번호가 일치하지 않습니다.' };
     },
 
     async signup(userData) {
       const email = userData.email.trim().toLowerCase();
 
-      // 1. 구글 스프레드시트 API 연동 시도
-      if (GAS_API_URL) {
-        try {
-          const res = await BlogSync.sendToSheet('signup', userData);
-          if (res && res.success && res.user) {
-            // 로컬에도 동기화
-            const users = this.getUsers();
-            if (!users.some(u => u.email.toLowerCase() === email)) {
-              users.push({ ...res.user, password: userData.password });
-              localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-            }
-            localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(res.user));
-            return { success: true, user: res.user };
-          } else if (res && res.message && !res.offline) {
-            // 스프레드시트에 아직 users 시트가 없는 환경적인 문제라면 가입을 차단하지 않고 로컬 DB로 안전하게 진행!
-            if (res.message.includes('시트') || res.message.includes('setupUsersSheet')) {
-              console.warn('⚠️ 구글 시트 설정 미완료 감지 -> 로컬 저장소 DB로 안전하게 가입 처리합니다.');
-            } else {
-              return { success: false, message: res.message };
-            }
-          }
-        } catch (err) {
-          console.warn('스프레드시트 회원가입 연동 실패, 로컬 DB로 전환:', err);
-        }
-      }
-
-      // 2. 로컬 스토리지 Fallback
+      // 1. [Local-First 아키텍처] 로컬 이메일 중복 검사 (0ms 즉시 검증)
       const users = this.getUsers();
       const exists = users.some(u => u.email.toLowerCase() === email);
       if (exists) {
         return { success: false, message: '이미 가입된 이메일 주소입니다.' };
       }
 
+      // 2. 로컬 스토리지 즉시 등록 및 즉시 로그인 세션 설정 (지연시간 0ms)
       const newUser = {
         id: 'user_' + Date.now(),
         email: email,
@@ -166,10 +150,22 @@
       users.push(newUser);
       localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
 
-      // 자동 로그인 처리
       const sessionUser = { ...newUser };
       delete sessionUser.password;
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(sessionUser));
+
+      // 3. 백그라운드 비동기 구글 스프레드시트 동기화 (UI 블로킹 및 대기시간 완전히 제거)
+      if (GAS_API_URL) {
+        BlogSync.sendToSheet('signup', userData)
+          .then(res => {
+            if (res && res.success && res.user) {
+              console.log('구글 시트 회원가입 백그라운드 동기화 완료');
+            }
+          })
+          .catch(err => {
+            console.warn('구글 시트 백그라운드 동기화 건너뜀 (로컬 정상 등록):', err);
+          });
+      }
 
       return { success: true, user: sessionUser };
     },
@@ -463,6 +459,49 @@
     }
   };
 
+  // ==================== DRAFT SERVICE (임시저장 매니저) ====================
+  const BlogDraft = {
+    save(data) {
+      try {
+        const now = new Date();
+        const displayTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+        const draft = {
+          ...data,
+          savedAt: Date.now(),
+          displayTime: displayTime
+        };
+        localStorage.setItem(STORAGE_KEYS.DRAFT, JSON.stringify(draft));
+        return draft;
+      } catch (e) {
+        console.warn('임시저장 실패:', e);
+        return null;
+      }
+    },
+
+    get() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.DRAFT);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    },
+
+    clear() {
+      try {
+        localStorage.removeItem(STORAGE_KEYS.DRAFT);
+      } catch (e) {}
+    },
+
+    hasDraft() {
+      const draft = this.get();
+      if (!draft) return false;
+      const hasTitle = Boolean(draft.title && draft.title.trim().length > 0);
+      const hasContent = Boolean(draft.content && draft.content.trim().length > 0);
+      return hasTitle || hasContent;
+    }
+  };
+
   // ==================== UI HELPERS ====================
   function showToast(message, type = 'info') {
     let toast = document.getElementById('toast');
@@ -599,12 +638,36 @@
     },
     async fetchPosts() {
       if (!GAS_API_URL) return null;
+
+      // 60초 캐싱 체크 (빈번한 네트워크 요청 방지 및 페이지 로딩 속도 극대화)
+      const lastSync = Number(localStorage.getItem(STORAGE_KEYS.LAST_SYNC) || '0');
+      const now = Date.now();
+      if (now - lastSync < 60000) {
+        return BlogPost.getAll();
+      }
+
       try {
-        const res = await fetch(`${GAS_API_URL}?action=getPosts`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+        const res = await fetch(`${GAS_API_URL}?action=getPosts`, { signal: controller.signal });
+        clearTimeout(timeoutId);
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
-          localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(json.data));
-          return json.data;
+          // 로컬 데이터와 지능적 병합 (사용자가 방금 로컬에 작성한 글 유실 방지)
+          const localPosts = BlogPost.getAll();
+          const remotePosts = json.data;
+          const merged = [...remotePosts];
+          localPosts.forEach(lp => {
+            if (!merged.some(rp => rp.id === lp.id)) {
+              merged.unshift(lp);
+            }
+          });
+
+          localStorage.setItem(STORAGE_KEYS.POSTS, JSON.stringify(merged));
+          localStorage.setItem(STORAGE_KEYS.LAST_SYNC, String(now));
+          window.dispatchEvent(new CustomEvent('devlog:posts-synced', { detail: merged }));
+          return merged;
         }
       } catch (err) {
         console.warn('스프레드시트 동기화 실패 (오프라인 모드 유지):', err);
@@ -614,9 +677,9 @@
     async sendToSheet(action, data) {
       if (!GAS_API_URL) return { success: false, offline: true };
 
-      // 3.5초 타임아웃 설정 (구글 시트 응답 지연 시 빠른 로컬 폴백)
+      // 2초 타임아웃 설정 (빠른 로컬 폴백 및 쾌적한 반응성)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       try {
         const res = await fetch(GAS_API_URL, {
@@ -654,6 +717,7 @@
     Auth: BlogAuth,
     Post: BlogPost,
     Comment: BlogComment,
+    Draft: BlogDraft,
     Sync: BlogSync,
     setGasUrl: (url) => BlogSync.setUrl(url),
     showToast: showToast,
@@ -666,8 +730,14 @@
   document.addEventListener('DOMContentLoaded', () => {
     initBlogNavbar();
     initFloatingWriteBtn();
-    if (GAS_API_URL) {
-      BlogSync.fetchPosts();
+
+    // 게시글 목록이 필요한 메인 홈 및 게시글 목록 페이지에서만 백그라운드 지연 실행 (초기 렌더링 블로킹 방지)
+    const pathname = window.location.pathname;
+    const isPostListingPage = pathname.endsWith('index.html') || pathname.endsWith('posts.html') || pathname === '/' || pathname.endsWith('/');
+    if (isPostListingPage && GAS_API_URL) {
+      setTimeout(() => {
+        BlogSync.fetchPosts();
+      }, 800);
     }
   });
 })();

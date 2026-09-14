@@ -60,8 +60,33 @@
             <h1 style="font-size: 1.3rem; font-weight: 700; margin: 0;" id="editor-page-title">새 글 작성</h1>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
+            <div id="autosave-status" class="autosave-status-pill" title="자동 임시저장 상태">
+              <i class="fa-solid fa-cloud"></i> <span>작성 대기</span>
+            </div>
             <button type="button" id="btn-load-draft" class="btn btn-outline btn-sm" title="임시저장된 글 불러오기">
-              <i class="fa-solid fa-clock-rotate-left"></i> 임시저장 불러오기
+              <i class="fa-solid fa-clock-rotate-left"></i> 불러오기
+            </button>
+            <button type="button" id="btn-clear-draft" class="btn btn-outline btn-sm" title="임시저장 비우기" style="display: none; color: #ef4444;">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Draft Alert Banner (이전에 작성 중이던 임시저장 글 발견 시 노출) -->
+        <div id="draft-alert-banner" class="draft-alert-banner" style="display: none;">
+          <div class="draft-alert-content">
+            <i class="fa-solid fa-file-circle-check draft-icon"></i>
+            <div class="draft-text-box">
+              <strong>이전에 작성 중이던 임시저장 글이 있습니다.</strong>
+              <span id="draft-saved-time" class="draft-saved-time"></span>
+            </div>
+          </div>
+          <div class="draft-actions">
+            <button type="button" id="btn-restore-draft" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-clock-rotate-left"></i> 복원하기
+            </button>
+            <button type="button" id="btn-discard-draft" class="btn btn-sm btn-outline" title="임시저장 삭제 후 새로 작성">
+              새로 쓰기
             </button>
           </div>
         </div>
@@ -209,13 +234,23 @@ console.log(greet);
       const coverInput = document.getElementById('post-cover');
       const contentTextarea = document.getElementById('post-content');
       const previewPane = document.getElementById('post-preview-pane');
+      const featuredCheckbox = document.getElementById('post-featured');
 
       const tabWriteBtn = document.getElementById('tab-write-btn');
       const tabPreviewBtn = document.getElementById('tab-preview-btn');
       const writeForm = document.getElementById('write-form');
       const btnSaveDraft = document.getElementById('btn-save-draft');
       const btnLoadDraft = document.getElementById('btn-load-draft');
+      const btnClearDraft = document.getElementById('btn-clear-draft');
+      const btnPublishPost = document.getElementById('btn-publish-post');
       const pageTitle = document.getElementById('editor-page-title');
+
+      // 자동 임시저장 및 복원 알림 요소
+      const autosaveStatus = document.getElementById('autosave-status');
+      const draftAlertBanner = document.getElementById('draft-alert-banner');
+      const draftSavedTime = document.getElementById('draft-saved-time');
+      const btnRestoreDraft = document.getElementById('btn-restore-draft');
+      const btnDiscardDraft = document.getElementById('btn-discard-draft');
 
       // 작성자 계정 안내 바 렌더링
       const authorBar = document.getElementById('author-status-bar');
@@ -243,20 +278,175 @@ console.log(greet);
         }
       }
 
+      // 폼 데이터 수집 헬퍼
+      function collectFormData() {
+        return {
+          title: titleInput.value,
+          category: categorySelect.value,
+          tags: tagsInput.value,
+          cover: coverInput.value,
+          content: contentTextarea.value,
+          featured: featuredCheckbox ? featuredCheckbox.checked : false
+        };
+      }
+
+      // 폼 데이터 채우기 헬퍼
+      function applyFormData(data) {
+        if (!data) return;
+        if (data.title !== undefined) titleInput.value = data.title;
+        if (data.category !== undefined) categorySelect.value = data.category;
+        if (data.tags !== undefined) tagsInput.value = data.tags;
+        if (data.cover !== undefined) coverInput.value = data.cover;
+        if (data.content !== undefined) contentTextarea.value = data.content;
+        if (data.featured !== undefined && featuredCheckbox) featuredCheckbox.checked = !!data.featured;
+      }
+
+      // 임시저장 상태 뱃지 업데이트
+      function updateAutosaveBadge(state, timeStr = '') {
+        if (!autosaveStatus) return;
+        if (state === 'saving') {
+          autosaveStatus.className = 'autosave-status-pill saving';
+          autosaveStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>저장 중...</span>';
+        } else if (state === 'saved') {
+          autosaveStatus.className = 'autosave-status-pill saved';
+          autosaveStatus.innerHTML = `<i class="fa-solid fa-check"></i> <span>${timeStr || '자동 저장됨'}</span>`;
+        } else {
+          autosaveStatus.className = 'autosave-status-pill';
+          autosaveStatus.innerHTML = '<i class="fa-solid fa-cloud"></i> <span>작성 대기</span>';
+        }
+      }
+
+      // 상단 비우기 버튼 노출 제어
+      function updateDraftUiButtons() {
+        const hasDraft = BlogCore.Draft.hasDraft();
+        if (btnClearDraft) {
+          btnClearDraft.style.display = hasDraft ? 'inline-flex' : 'none';
+        }
+      }
+
+      // 실시간 자동 저장 (디바운스 800ms)
+      let autosaveTimeout = null;
+      function triggerAutosave() {
+        if (editPostId) return; // 기존 발행글 수정 중일 때는 임시저장 덮어쓰지 않음
+        const currentData = collectFormData();
+        if (!currentData.title.trim() && !currentData.content.trim()) {
+          updateAutosaveBadge('idle');
+          return;
+        }
+
+        updateAutosaveBadge('saving');
+        clearTimeout(autosaveTimeout);
+        autosaveTimeout = setTimeout(() => {
+          const draft = BlogCore.Draft.save(currentData);
+          if (draft) {
+            updateAutosaveBadge('saved', `${draft.displayTime} 저장됨`);
+            updateDraftUiButtons();
+          }
+        }, 800);
+      }
+
+      // 입력 이벤트 리스너 바인딩 (실시간 자동 임시저장)
+      titleInput.addEventListener('input', triggerAutosave);
+      contentTextarea.addEventListener('input', triggerAutosave);
+      tagsInput.addEventListener('input', triggerAutosave);
+      coverInput.addEventListener('input', triggerAutosave);
+      categorySelect.addEventListener('change', triggerAutosave);
+      if (featuredCheckbox) featuredCheckbox.addEventListener('change', triggerAutosave);
+
       // 수정 모드일 때 기존 데이터 불러오기
       if (editPostId) {
         const existingPost = BlogCore.Post.getById(editPostId);
         if (existingPost) {
           pageTitle.textContent = '게시글 수정';
-          document.title = `게시글 수정 | DevLog`;
+          document.title = '게시글 수정 | DevLog';
           titleInput.value = existingPost.title || '';
           categorySelect.value = existingPost.category || 'frontend';
           tagsInput.value = (existingPost.tags || []).join(', ');
           coverInput.value = existingPost.coverImage || '';
-          const featuredCheckbox = document.getElementById('post-featured');
           if (featuredCheckbox) featuredCheckbox.checked = !!existingPost.featured;
           contentTextarea.value = existingPost.content || '';
+          if (btnPublishPost) btnPublishPost.innerHTML = '<i class="fa-solid fa-check"></i> 수정 완료';
         }
+      } else {
+        // 새 글 작성 모드: 기존 임시저장 글 감지 시 복원 배너 표시
+        if (BlogCore.Draft.hasDraft()) {
+          const draft = BlogCore.Draft.get();
+          if (draft) {
+            if (draftAlertBanner) draftAlertBanner.style.display = 'flex';
+            if (draftSavedTime) draftSavedTime.textContent = `(최근 저장: ${draft.displayTime || new Date(draft.savedAt).toLocaleTimeString()})`;
+            updateDraftUiButtons();
+          }
+        }
+      }
+
+      // 복원하기 배너 버튼 클릭
+      if (btnRestoreDraft) {
+        btnRestoreDraft.addEventListener('click', () => {
+          const draft = BlogCore.Draft.get();
+          if (draft) {
+            applyFormData(draft);
+            if (draftAlertBanner) draftAlertBanner.style.display = 'none';
+            updateAutosaveBadge('saved', `${draft.displayTime || ''} 복원됨`);
+            BlogCore.showToast('임시저장 내용을 성공적으로 복원했습니다.', 'success');
+          }
+        });
+      }
+
+      // 새로 쓰기(임시저장 삭제) 배너 버튼 클릭
+      if (btnDiscardDraft) {
+        btnDiscardDraft.addEventListener('click', () => {
+          if (confirm('임시저장된 글을 삭제하고 새로 작성하시겠습니까?')) {
+            BlogCore.Draft.clear();
+            if (draftAlertBanner) draftAlertBanner.style.display = 'none';
+            updateDraftUiButtons();
+            updateAutosaveBadge('idle');
+            BlogCore.showToast('임시저장 내용이 삭제되었습니다.', 'info');
+          }
+        });
+      }
+
+      // 상단 임시저장 불러오기 버튼 클릭
+      if (btnLoadDraft) {
+        btnLoadDraft.addEventListener('click', () => {
+          const draft = BlogCore.Draft.get();
+          if (!draft || (!draft.title && !draft.content)) {
+            BlogCore.showToast('저장된 임시 글이 없습니다.', 'info');
+            return;
+          }
+
+          if (confirm(`[${draft.displayTime || ''}] 임시저장된 내용을 불러오시겠습니까?\n현재 입력한 내용은 대체됩니다.`)) {
+            applyFormData(draft);
+            if (draftAlertBanner) draftAlertBanner.style.display = 'none';
+            updateAutosaveBadge('saved', `${draft.displayTime || ''} 복원됨`);
+            BlogCore.showToast('임시저장 내용을 성공적으로 불러왔습니다.', 'success');
+          }
+        });
+      }
+
+      // 상단 임시저장 비우기 버튼 클릭
+      if (btnClearDraft) {
+        btnClearDraft.addEventListener('click', () => {
+          if (confirm('임시저장된 글을 완전히 비우시겠습니까?')) {
+            BlogCore.Draft.clear();
+            if (draftAlertBanner) draftAlertBanner.style.display = 'none';
+            updateDraftUiButtons();
+            updateAutosaveBadge('idle');
+            BlogCore.showToast('임시저장이 비워졌습니다.', 'info');
+          }
+        });
+      }
+
+      // 하단 수동 임시저장 버튼 클릭
+      if (btnSaveDraft) {
+        btnSaveDraft.addEventListener('click', () => {
+          const currentData = collectFormData();
+          const draft = BlogCore.Draft.save(currentData);
+          if (draft) {
+            updateAutosaveBadge('saved', `${draft.displayTime} 저장됨`);
+            updateDraftUiButtons();
+            BlogCore.showToast(`[${draft.displayTime}] 임시저장 완료!`, 'success');
+          }
+        });
       }
 
       // 탭 전환 (작성 vs 미리보기)
@@ -325,42 +515,10 @@ console.log(greet);
 
         contentTextarea.setRangeText(replacement, start, end, 'end');
         contentTextarea.focus();
+        triggerAutosave();
       }
 
-      // 임시저장
-      btnSaveDraft.addEventListener('click', () => {
-        const draft = {
-          title: titleInput.value,
-          category: categorySelect.value,
-          tags: tagsInput.value,
-          cover: coverInput.value,
-          content: contentTextarea.value,
-          savedAt: new Date().toLocaleTimeString()
-        };
-        localStorage.setItem('devlog_draft', JSON.stringify(draft));
-        BlogCore.showToast(`[${draft.savedAt}] 임시저장 완료!`, 'success');
-      });
-
-      // 임시저장 불러오기
-      btnLoadDraft.addEventListener('click', () => {
-        const draftStr = localStorage.getItem('devlog_draft');
-        if (!draftStr) {
-          BlogCore.showToast('저장된 임시 글이 없습니다.', 'info');
-          return;
-        }
-
-        if (confirm('임시저장된 내용을 불러오시겠습니까? 현재 작성 중인 내용은 덮어씌워집니다.')) {
-          const draft = JSON.parse(draftStr);
-          titleInput.value = draft.title || '';
-          categorySelect.value = draft.category || 'frontend';
-          tagsInput.value = draft.tags || '';
-          coverInput.value = draft.cover || '';
-          contentTextarea.value = draft.content || '';
-          BlogCore.showToast('임시저장 내용을 성공적으로 불러왔습니다.', 'success');
-        }
-      });
-
-      // 폼 제출 (게시하기)
+      // 폼 제출 (게시하기 - 초고속 즉시 등록)
       writeForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -384,7 +542,6 @@ console.log(greet);
           return;
         }
 
-        const featuredCheckbox = document.getElementById('post-featured');
         const isFeatured = featuredCheckbox ? featuredCheckbox.checked : false;
 
         const postPayload = {
@@ -397,24 +554,35 @@ console.log(greet);
           content
         };
 
+        // 버튼 비활성화 및 즉시 로딩 표시
+        if (btnPublishPost) {
+          btnPublishPost.disabled = true;
+          btnPublishPost.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 게시 중...';
+        }
+
         if (editPostId) {
           // 수정
           const updated = BlogCore.Post.update(editPostId, postPayload);
           if (updated) {
-            localStorage.removeItem('devlog_draft');
+            BlogCore.Draft.clear();
             BlogCore.showToast('게시글이 성공적으로 수정되었습니다!', 'success');
             setTimeout(() => {
               window.location.href = `post-detail.html?id=${updated.id}`;
-            }, 700);
+            }, 250);
+          } else {
+            if (btnPublishPost) {
+              btnPublishPost.disabled = false;
+              btnPublishPost.innerHTML = '<i class="fa-solid fa-paper-plane"></i> 게시하기';
+            }
           }
         } else {
-          // 신규 작성
+          // 신규 작성 (0ms 즉시 스토리지 기록)
           const newPost = BlogCore.Post.create(postPayload);
-          localStorage.removeItem('devlog_draft');
+          BlogCore.Draft.clear();
           BlogCore.showToast('새 게시글이 성공적으로 등록되었습니다!', 'success');
           setTimeout(() => {
             window.location.href = `post-detail.html?id=${newPost.id}`;
-          }, 700);
+          }, 250);
         }
       });
     });
