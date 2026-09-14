@@ -101,13 +101,21 @@
           </div>
 
           <!-- Cover Image Input (Optional) -->
-          <div style="margin-bottom: 20px;">
+          <div style="margin-bottom: 14px;">
             <input 
               type="url" 
               id="post-cover" 
               class="editor-input" 
               placeholder="커버 이미지 URL (선택사항, 미입력 시 멋진 개발 테마 기본 이미지가 적용됩니다)" 
             />
+          </div>
+
+          <!-- Options: Featured Post Checkbox -->
+          <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <input type="checkbox" id="post-featured" style="cursor: pointer; width: 16px; height: 16px;" />
+            <label for="post-featured" style="cursor: pointer; user-select: none;">
+              <i class="fa-solid fa-star" style="color: #f59e0b;"></i> 메인 페이지 대표(Featured) 추천 글로 등록
+            </label>
           </div>
 
           <!-- Editor Toolbar -->
@@ -245,6 +253,8 @@ console.log(greet);
           categorySelect.value = existingPost.category || 'frontend';
           tagsInput.value = (existingPost.tags || []).join(', ');
           coverInput.value = existingPost.coverImage || '';
+          const featuredCheckbox = document.getElementById('post-featured');
+          if (featuredCheckbox) featuredCheckbox.checked = !!existingPost.featured;
           contentTextarea.value = existingPost.content || '';
         }
       }
@@ -374,12 +384,16 @@ console.log(greet);
           return;
         }
 
+        const featuredCheckbox = document.getElementById('post-featured');
+        const isFeatured = featuredCheckbox ? featuredCheckbox.checked : false;
+
         const postPayload = {
           title,
           category,
           categoryName,
           tags: tags.length > 0 ? tags : ['Dev'],
           coverImage: coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop',
+          featured: isFeatured,
           content
         };
 

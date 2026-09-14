@@ -234,22 +234,41 @@
       const wordCount = (postData.content || '').length;
       const estimatedMinutes = Math.max(1, Math.ceil(wordCount / 400));
 
+      // 마크다운 문법을 정제하여 카드 요약문(summary) 생성
+      const plainContent = (postData.content || '')
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/#+\s+/g, '')
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\(.*?\)/g, '$1')
+        .replace(/[*_~>]/g, '')
+        .replace(/\n+/g, ' ')
+        .trim();
+
+      const summary = postData.summary && postData.summary.trim()
+        ? postData.summary.trim()
+        : (plainContent.length > 120 ? plainContent.substring(0, 120) + '...' : plainContent || '내용이 없습니다.');
+
+      if (postData.featured) {
+        posts.forEach(p => p.featured = false);
+      }
+
       const newPost = {
         id: Date.now(),
         title: postData.title,
         category: postData.category || 'devlife',
         categoryName: postData.categoryName || '개발 이야기',
-        summary: postData.summary || postData.content.substring(0, 120) + '...',
+        summary: summary,
         coverImage: postData.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop',
         authorId: user.id,
-        authorName: user.name || user.nickname,
+        authorName: user.nickname || user.name,
         authorAvatar: user.avatar || 'assets/images/profile.jpg',
         createdAt: dateStr,
         readTime: `${estimatedMinutes}분`,
         views: 0,
         likes: 0,
         tags: postData.tags || [],
-        featured: postData.featured || false,
+        featured: !!postData.featured,
         content: postData.content
       };
 
@@ -270,15 +289,34 @@
       const wordCount = (postData.content || '').length;
       const estimatedMinutes = Math.max(1, Math.ceil(wordCount / 400));
 
+      const plainContent = (postData.content || '')
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/#+\s+/g, '')
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/\[([^\]]+)\]\(.*?\)/g, '$1')
+        .replace(/[*_~>]/g, '')
+        .replace(/\n+/g, ' ')
+        .trim();
+
+      const summary = postData.summary && postData.summary.trim()
+        ? postData.summary.trim()
+        : (plainContent.length > 120 ? plainContent.substring(0, 120) + '...' : plainContent || '내용이 없습니다.');
+
+      if (postData.featured) {
+        posts.forEach(p => p.featured = false);
+      }
+
       posts[index] = {
         ...posts[index],
         title: postData.title,
         category: postData.category,
         categoryName: postData.categoryName || posts[index].categoryName,
-        summary: postData.summary || postData.content.substring(0, 120) + '...',
+        summary: summary,
         coverImage: postData.coverImage || posts[index].coverImage,
         tags: postData.tags || posts[index].tags,
         readTime: `${estimatedMinutes}분`,
+        featured: postData.featured !== undefined ? !!postData.featured : posts[index].featured,
         content: postData.content,
         updatedAt: new Date().toISOString().split('T')[0]
       };

@@ -226,24 +226,24 @@
         }
 
         postsGrid.innerHTML = currentPosts.map(post => `
-          <article class="post-card">
-            <a href="post-detail.html?id=${post.id}" class="post-card-thumb-wrap">
-              <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600'}" alt="${post.title}" class="post-card-thumb" loading="lazy">
+          <article class="post-card" onclick="window.location.href='post-detail.html?id=${post.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${post.title}">
+            <a href="post-detail.html?id=${post.id}" class="post-card-thumb-wrap" onclick="event.stopPropagation()">
+              <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600'}" alt="${post.title}" class="post-card-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600'">
               <span class="post-card-category">${post.categoryName || post.category}</span>
             </a>
             <div class="post-card-body">
               <h3 class="post-card-title">
-                <a href="post-detail.html?id=${post.id}">${post.title}</a>
+                <a href="post-detail.html?id=${post.id}" onclick="event.stopPropagation()">${post.title}</a>
               </h3>
-              <p class="post-card-desc">${post.summary}</p>
+              <p class="post-card-desc">${post.summary || ''}</p>
               
               <div class="post-card-tags">
-                ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag">#${t}</a>`).join('')}
+                ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" onclick="event.stopPropagation()">#${t}</a>`).join('')}
               </div>
 
               <div class="post-card-footer">
                 <div class="post-author-mini">
-                  <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-mini-avatar">
+                  <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-mini-avatar" onerror="this.src='assets/images/profile.jpg'">
                   <span>${post.authorName}</span>
                 </div>
                 <div class="post-card-stats">

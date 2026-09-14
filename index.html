@@ -190,33 +190,40 @@
     document.addEventListener('DOMContentLoaded', () => {
       const posts = BlogCore.Post.getAll();
 
-      // 1. 피처드 포스트 렌더링
-      const featuredPost = posts.find(p => p.featured) || posts[0];
+      // 최신 등록 순으로 정렬 (id 역순 또는 createdAt 역순)
+      const sortedPosts = [...posts].sort((a, b) => {
+        const timeA = new Date(a.createdAt).getTime() || Number(a.id) || 0;
+        const timeB = new Date(b.createdAt).getTime() || Number(b.id) || 0;
+        return timeB - timeA;
+      });
+
+      // 1. 피처드 포스트 렌더링 (추천 설정된 글 또는 가장 최신 글)
+      const featuredPost = sortedPosts.find(p => p.featured) || sortedPosts[0];
       const featuredContainer = document.getElementById('featured-post-container');
 
       if (featuredPost && featuredContainer) {
         featuredContainer.innerHTML = `
-          <div class="featured-post-card">
-            <a href="post-detail.html?id=${featuredPost.id}" class="featured-post-img-wrap">
-              <img src="${featuredPost.coverImage}" alt="${featuredPost.title}" class="featured-post-img">
+          <div class="featured-post-card" onclick="window.location.href='post-detail.html?id=${featuredPost.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${featuredPost.title}">
+            <a href="post-detail.html?id=${featuredPost.id}" class="featured-post-img-wrap" onclick="event.stopPropagation()">
+              <img src="${featuredPost.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'}" alt="${featuredPost.title}" class="featured-post-img" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1200&auto=format&fit=crop'">
               <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured</span>
             </a>
             <div class="featured-post-body">
-              <span class="post-category-tag">${featuredPost.categoryName}</span>
+              <span class="post-category-tag">${featuredPost.categoryName || '개발 이야기'}</span>
               <h2 class="featured-post-title">
-                <a href="post-detail.html?id=${featuredPost.id}">${featuredPost.title}</a>
+                <a href="post-detail.html?id=${featuredPost.id}" onclick="event.stopPropagation()">${featuredPost.title}</a>
               </h2>
-              <p class="featured-post-desc">${featuredPost.summary}</p>
+              <p class="featured-post-desc">${featuredPost.summary || ''}</p>
               <div class="post-card-tags" style="margin-bottom: 20px;">
-                ${(featuredPost.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag">#${t}</a>`).join('')}
+                ${(featuredPost.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" onclick="event.stopPropagation()">#${t}</a>`).join('')}
               </div>
               <div class="post-card-footer" style="padding-top: 14px;">
                 <div class="post-author-mini">
-                  <img src="${featuredPost.authorAvatar || 'assets/images/profile.jpg'}" alt="${featuredPost.authorName}" class="author-mini-avatar">
+                  <img src="${featuredPost.authorAvatar || 'assets/images/profile.jpg'}" alt="${featuredPost.authorName}" class="author-mini-avatar" onerror="this.src='assets/images/profile.jpg'">
                   <span>${featuredPost.authorName}</span>
-                  <span style="color: var(--text-muted);">• ${featuredPost.createdAt.split(' ')[0]}</span>
+                  <span style="color: var(--text-muted);">• ${(featuredPost.createdAt || '').split(' ')[0]}</span>
                 </div>
-                <a href="post-detail.html?id=${featuredPost.id}" class="btn btn-primary btn-sm">
+                <a href="post-detail.html?id=${featuredPost.id}" class="btn btn-primary btn-sm" onclick="event.stopPropagation()">
                   읽기 <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
@@ -225,53 +232,71 @@
         `;
       }
 
-      // 2. 홈 최신 게시글 4개 렌더링
+      // 2. 홈 최신 게시글 6개 렌더링
       const homePostsGrid = document.getElementById('home-posts-grid');
       if (homePostsGrid) {
-        const recentPosts = posts.slice(0, 4);
-        homePostsGrid.innerHTML = recentPosts.map(post => `
-          <article class="post-card">
-            <a href="post-detail.html?id=${post.id}" class="post-card-thumb-wrap">
-              <img src="${post.coverImage}" alt="${post.title}" class="post-card-thumb" loading="lazy">
-              <span class="post-card-category">${post.categoryName}</span>
-            </a>
-            <div class="post-card-body">
-              <h3 class="post-card-title">
-                <a href="post-detail.html?id=${post.id}">${post.title}</a>
-              </h3>
-              <p class="post-card-desc">${post.summary}</p>
-              <div class="post-card-tags">
-                ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag">#${t}</a>`).join('')}
-              </div>
-              <div class="post-card-footer">
-                <div class="post-author-mini">
-                  <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName}" class="author-mini-avatar">
-                  <span>${post.authorName}</span>
-                </div>
-                <div class="post-card-stats">
-                  <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span>
-                  <span><i class="fa-regular fa-heart"></i> ${post.likes || 0}</span>
-                </div>
-              </div>
+        if (sortedPosts.length === 0) {
+          homePostsGrid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 48px 24px; text-align: center;">
+              <i class="fa-regular fa-file-lines empty-state-icon" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 12px;"></i>
+              <h3 class="empty-state-title" style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">아직 등록된 게시글이 없습니다</h3>
+              <p style="color: var(--text-muted); margin-bottom: 16px;">첫 번째 기술 블로그 글을 작성해 보세요!</p>
+              <a href="write.html" class="btn btn-primary">
+                <i class="fa-solid fa-pen-nib"></i> 새 글 작성하기
+              </a>
             </div>
-          </article>
-        `).join('');
+          `;
+        } else {
+          const recentPosts = sortedPosts.slice(0, 6);
+          homePostsGrid.innerHTML = recentPosts.map((post, idx) => {
+            const isNew = idx === 0;
+            return `
+              <article class="post-card" onclick="window.location.href='post-detail.html?id=${post.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${post.title}">
+                <a href="post-detail.html?id=${post.id}" class="post-card-thumb-wrap" onclick="event.stopPropagation()">
+                  <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600'}" alt="${post.title}" class="post-card-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=600'">
+                  <span class="post-card-category">${post.categoryName || '개발'}</span>
+                  ${isNew ? '<span class="post-card-badge-new" style="position: absolute; top: 10px; right: 10px; background: #ef4444; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-bolt"></i> NEW</span>' : ''}
+                </a>
+                <div class="post-card-body">
+                  <h3 class="post-card-title">
+                    <a href="post-detail.html?id=${post.id}" onclick="event.stopPropagation()">${post.title}</a>
+                  </h3>
+                  <p class="post-card-desc">${post.summary || '내용이 없습니다.'}</p>
+                  <div class="post-card-tags">
+                    ${(post.tags || []).map(t => `<a href="posts.html?tag=${encodeURIComponent(t)}" class="post-card-tag" onclick="event.stopPropagation()">#${t}</a>`).join('')}
+                  </div>
+                  <div class="post-card-footer">
+                    <div class="post-author-mini">
+                      <img src="${post.authorAvatar || 'assets/images/profile.jpg'}" alt="${post.authorName || '작성자'}" class="author-mini-avatar" onerror="this.src='assets/images/profile.jpg'">
+                      <span>${post.authorName || '익명'}</span>
+                    </div>
+                    <div class="post-card-stats">
+                      <span title="조회수"><i class="fa-regular fa-eye"></i> ${post.views || 0}</span>
+                      <span title="좋아요"><i class="fa-regular fa-heart"></i> ${post.likes || 0}</span>
+                      <span title="작성일"><i class="fa-regular fa-calendar"></i> ${(post.createdAt || '').split(' ')[0]}</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('');
+        }
       }
 
       // 3. 인기 글 랭킹 (조회수 기준 상위 3개)
       const popularList = document.getElementById('popular-posts-list');
       if (popularList) {
-        const popularPosts = [...posts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+        const popularPosts = [...sortedPosts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
         popularList.innerHTML = popularPosts.map(post => `
-          <div class="sidebar-recent-item">
-            <img src="${post.coverImage}" alt="${post.title}" class="sidebar-recent-thumb">
+          <div class="sidebar-recent-item" onclick="window.location.href='post-detail.html?id=${post.id}'" role="button" tabindex="0" style="cursor: pointer;" title="${post.title}">
+            <img src="${post.coverImage || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'}" alt="${post.title}" class="sidebar-recent-thumb" onerror="this.src='https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=200'">
             <div class="sidebar-recent-info">
               <h4 class="sidebar-recent-title">
-                <a href="post-detail.html?id=${post.id}">${post.title}</a>
+                <a href="post-detail.html?id=${post.id}" onclick="event.stopPropagation()">${post.title}</a>
               </h4>
               <div class="sidebar-recent-date">
                 <span><i class="fa-regular fa-eye"></i> ${post.views || 0}</span> • 
-                <span>${post.createdAt.split(' ')[0]}</span>
+                <span>${(post.createdAt || '').split(' ')[0]}</span>
               </div>
             </div>
           </div>
@@ -282,7 +307,7 @@
       const tagCloud = document.getElementById('home-tag-cloud');
       if (tagCloud) {
         const tagMap = {};
-        posts.forEach(p => {
+        sortedPosts.forEach(p => {
           (p.tags || []).forEach(t => {
             tagMap[t] = (tagMap[t] || 0) + 1;
           });

@@ -1561,6 +1561,7 @@ button, input, textarea {
   box-shadow: var(--shadow-md);
   margin-bottom: 40px;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .featured-post-card:hover {
@@ -1651,6 +1652,7 @@ button, input, textarea {
   flex-direction: column;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .post-card:hover {
@@ -1890,6 +1892,14 @@ button, input, textarea {
   display: flex;
   gap: 12px;
   align-items: center;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  padding: 4px;
+  transition: var(--transition-fast);
+}
+
+.sidebar-recent-item:hover {
+  background: var(--bg-alt);
 }
 
 .sidebar-recent-thumb {
