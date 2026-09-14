@@ -169,7 +169,18 @@
 
     logout() {
       localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-      window.location.reload();
+      showToast('로그아웃 되었습니다.', 'info');
+      initBlogNavbar();
+      const currentPath = window.location.pathname;
+      if (currentPath.includes('profile.html') || currentPath.includes('write.html')) {
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 350);
+      } else {
+        setTimeout(() => {
+          window.location.reload();
+        }, 350);
+      }
     },
 
     updateProfile(updatedData) {
@@ -431,21 +442,21 @@
     if (!authContainer) return;
 
     const currentUser = BlogAuth.getCurrentUser();
+    const currentPath = window.location.pathname;
+    const isProfilePage = currentPath.endsWith('profile.html') || currentPath.includes('profile.html');
+    const userName = currentUser ? (currentUser.nickname || currentUser.name || '사용자') : '';
 
     if (currentUser) {
       authContainer.innerHTML = `
         <a href="write.html" class="btn btn-sm btn-primary nav-write-btn" title="새 글 작성">
           <i class="fa-solid fa-pen-nib"></i> <span class="nav-btn-text">글쓰기</span>
         </a>
-        <div class="user-profile-menu">
-          <a href="profile.html" class="user-avatar-link" title="내 프로필 (${currentUser.nickname || currentUser.name})">
-            <img src="${currentUser.avatar || 'assets/images/profile.jpg'}" alt="프로필" class="nav-avatar-img">
-            <span class="nav-user-name">${currentUser.nickname || currentUser.name}</span>
-          </a>
-          <button id="logout-btn" class="btn btn-sm btn-outline nav-logout-btn" title="로그아웃">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-          </button>
-        </div>
+        <a href="profile.html" class="btn btn-sm btn-outline nav-profile-btn ${isProfilePage ? 'active' : ''}" id="nav-profile-btn" title="내 프로필 (${userName})">
+          <i class="fa-solid fa-user"></i> <span class="nav-btn-text">프로필</span>
+        </a>
+        <button id="logout-btn" class="btn btn-sm btn-outline nav-logout-btn" title="로그아웃">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="nav-btn-text">로그아웃</span>
+        </button>
       `;
 
       const logoutBtn = document.getElementById('logout-btn');
@@ -459,10 +470,10 @@
       }
     } else {
       authContainer.innerHTML = `
-        <a href="login.html" class="btn btn-sm btn-outline nav-login-btn">
+        <a href="login.html" class="btn btn-sm btn-outline nav-login-btn" title="로그인">
           <i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="nav-btn-text">로그인</span>
         </a>
-        <a href="signup.html" class="btn btn-sm btn-primary nav-signup-btn">
+        <a href="signup.html" class="btn btn-sm btn-primary nav-signup-btn" title="회원가입">
           <i class="fa-solid fa-user-plus"></i> <span class="nav-btn-text">회원가입</span>
         </a>
       `;

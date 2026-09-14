@@ -183,17 +183,15 @@
     document.addEventListener('DOMContentLoaded', () => {
       let currentUser = BlogCore.Auth.getCurrentUser();
 
-      // 로그인 안 되어 있을 경우 데모 안내 또는 로그인 페이지 이동 안내
+      // 로그인 안 되어 있을 경우 게스트 안내 및 로그인 유도
       if (!currentUser) {
-        // 기본으로 첫 번째 관리자 유저 정보 표시하되 비로그인 알림
-        const users = BlogCore.Auth.getUsers();
-        currentUser = users[0] || {
+        currentUser = {
           id: 'guest',
           nickname: '게스트 사용자',
-          email: 'guest@example.com',
-          bio: '로그인하시면 나만의 글 작성과 프로필 관리를 하실 수 있습니다.',
+          email: '로그인이 필요합니다 (guest@example.com)',
+          bio: '로그인하시면 나만의 프로필 관리, 새 글 작성, 좋아요 및 활동 내역을 편리하게 확인하실 수 있습니다.',
           avatar: 'assets/images/profile.jpg',
-          interests: ['JavaScript', 'HTML/CSS']
+          interests: ['DevLog', '게스트']
         };
 
         const topActions = document.querySelector('.profile-top-actions');
