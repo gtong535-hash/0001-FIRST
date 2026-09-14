@@ -444,11 +444,12 @@
     const currentUser = BlogAuth.getCurrentUser();
     const currentPath = window.location.pathname;
     const isProfilePage = currentPath.endsWith('profile.html') || currentPath.includes('profile.html');
+    const isWritePage = currentPath.endsWith('write.html') || currentPath.includes('write.html');
     const userName = currentUser ? (currentUser.nickname || currentUser.name || '사용자') : '';
 
     if (currentUser) {
       authContainer.innerHTML = `
-        <a href="write.html" class="btn btn-sm btn-primary nav-write-btn" title="새 글 작성">
+        <a href="write.html" class="btn btn-sm btn-primary nav-write-btn ${isWritePage ? 'active' : ''}" title="새 글 작성">
           <i class="fa-solid fa-pen-nib"></i> <span class="nav-btn-text">글쓰기</span>
         </a>
         <a href="profile.html" class="btn btn-sm btn-outline nav-profile-btn ${isProfilePage ? 'active' : ''}" id="nav-profile-btn" title="내 프로필 (${userName})">
@@ -470,6 +471,9 @@
       }
     } else {
       authContainer.innerHTML = `
+        <a href="write.html" class="btn btn-sm btn-outline nav-write-btn ${isWritePage ? 'active' : ''}" title="새 글 작성">
+          <i class="fa-solid fa-pen-nib"></i> <span class="nav-btn-text">글쓰기</span>
+        </a>
         <a href="login.html" class="btn btn-sm btn-outline nav-login-btn" title="로그인">
           <i class="fa-solid fa-arrow-right-to-bracket"></i> <span class="nav-btn-text">로그인</span>
         </a>
@@ -478,6 +482,29 @@
         </a>
       `;
     }
+  }
+
+  // 화면 우측 하단 플로팅 글쓰기 버튼 자동 생성
+  function initFloatingWriteBtn() {
+    const currentPath = window.location.pathname;
+    // 글쓰기, 로그인, 회원가입 페이지에서는 플로팅 버튼 제외
+    if (currentPath.includes('write.html') || currentPath.includes('login.html') || currentPath.includes('signup.html')) {
+      return;
+    }
+
+    if (document.getElementById('floating-write-btn')) return;
+
+    const fab = document.createElement('a');
+    fab.id = 'floating-write-btn';
+    fab.href = 'write.html';
+    fab.className = 'floating-write-btn';
+    fab.setAttribute('title', '새 글 작성하기');
+    fab.setAttribute('aria-label', '새 글 작성하기');
+    fab.innerHTML = `
+      <i class="fa-solid fa-pen-nib"></i>
+      <span class="fab-text">글쓰기</span>
+    `;
+    document.body.appendChild(fab);
   }
 
   // 간단한 마크다운 파서 (제목, 코드블록, 인용, 굵게, 기울임, 링크)
@@ -586,12 +613,14 @@
     setGasUrl: (url) => BlogSync.setUrl(url),
     showToast: showToast,
     initBlogNavbar: initBlogNavbar,
+    initFloatingWriteBtn: initFloatingWriteBtn,
     parseSimpleMarkdown: parseSimpleMarkdown
   };
 
   // DOM 로드 시 자동 실행
   document.addEventListener('DOMContentLoaded', () => {
     initBlogNavbar();
+    initFloatingWriteBtn();
     if (GAS_API_URL) {
       BlogSync.fetchPosts();
     }

@@ -66,6 +66,9 @@
           </div>
         </div>
 
+        <!-- Author Status & Login Guidance Bar -->
+        <div id="author-status-bar" style="margin-bottom: 18px;"></div>
+
         <form id="write-form" novalidate>
           <!-- Title Input -->
           <input 
@@ -205,6 +208,32 @@ console.log(greet);
       const btnSaveDraft = document.getElementById('btn-save-draft');
       const btnLoadDraft = document.getElementById('btn-load-draft');
       const pageTitle = document.getElementById('editor-page-title');
+
+      // 작성자 계정 안내 바 렌더링
+      const authorBar = document.getElementById('author-status-bar');
+      const currentUser = BlogCore.Auth.getCurrentUser();
+      if (authorBar) {
+        if (currentUser) {
+          authorBar.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: var(--text-main); background: var(--bg-alt); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <img src="${currentUser.avatar || 'assets/images/profile.jpg'}" alt="작성자" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary);">
+              <span><strong>${currentUser.nickname || currentUser.name}</strong> 님의 계정으로 글이 발행됩니다.</span>
+            </div>
+          `;
+        } else {
+          authorBar.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.88rem; color: var(--text-muted); background: var(--bg-alt); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i>
+                <span>현재 비로그인 상태입니다. 게스트(익명)로 작성하거나 로그인 후 등록하실 수 있습니다.</span>
+              </div>
+              <a href="login.html?redirect=write.html" class="btn btn-sm btn-outline" style="padding: 4px 12px; font-size: 0.82rem;">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> 로그인하기
+              </a>
+            </div>
+          `;
+        }
+      }
 
       // 수정 모드일 때 기존 데이터 불러오기
       if (editPostId) {

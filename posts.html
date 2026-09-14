@@ -210,10 +210,15 @@
             <div class="empty-state" style="grid-column: 1 / -1;">
               <i class="fa-solid fa-folder-open empty-state-icon"></i>
               <h3 class="empty-state-title">검색된 게시글이 없습니다</h3>
-              <p>다른 검색어를 입력하시거나 카테고리 필터를 변경해 보세요.</p>
-              <button class="btn btn-outline" style="margin-top: 14px;" onclick="resetFilters()">
-                <i class="fa-solid fa-rotate-left"></i> 필터 초기화
-              </button>
+              <p>다른 검색어를 입력하시거나 새로운 기술 글을 작성해 보세요.</p>
+              <div style="display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="resetFilters()">
+                  <i class="fa-solid fa-rotate-left"></i> 필터 초기화
+                </button>
+                <a href="write.html" class="btn btn-primary">
+                  <i class="fa-solid fa-pen-nib"></i> 새 글 작성하기
+                </a>
+              </div>
             </div>
           `;
           paginationContainer.innerHTML = '';

@@ -1363,6 +1363,14 @@ button, input, textarea {
   font-size: 0.85rem;
   font-weight: 600;
   border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.nav-write-btn.active {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .nav-profile-btn {
@@ -1416,6 +1424,37 @@ button, input, textarea {
   color: #ef4444;
   border-color: #ef4444;
   background: rgba(239, 68, 68, 0.08);
+}
+
+/* Floating Action Button (Write Post) */
+.floating-write-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 99;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 18px rgba(59, 130, 246, 0.4);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.floating-write-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.52);
+  color: #ffffff !important;
+}
+
+.floating-write-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .user-profile-menu {
@@ -2943,6 +2982,20 @@ button, input, textarea {
   }
 
   .nav-btn-text {
+    display: none;
+  }
+
+  .floating-write-btn {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 14px;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    justify-content: center;
+  }
+
+  .floating-write-btn .fab-text {
     display: none;
   }
 }
